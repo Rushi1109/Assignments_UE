@@ -2,6 +2,7 @@
 
 
 #include "StaircaseActor.h"
+#include <math.h>
 
 // Sets default values
 AStaircaseActor::AStaircaseActor() : NumberOfSteps{1}, Dimensions{1.0, 1.0, 1.0}, TranslationOffset{100.0, 0.0, 100.0}, EnableRailing{false}
@@ -25,8 +26,7 @@ void AStaircaseActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AStaircaseActor::OnConstruction(const FTransform& Transform) {
-	UE_LOG(LogTemp, Warning, TEXT("Inside OnConstruction"));
+void AStaircaseActor::DestroyStairs() {
 
 	for (int i = 0; i < StaticMeshComponents.Num(); i++) {
 		if (StaticMeshComponents[i].HandrailLeftComponent) {
@@ -52,6 +52,12 @@ void AStaircaseActor::OnConstruction(const FTransform& Transform) {
 	}
 
 	StaticMeshComponents.Empty();
+}
+
+void AStaircaseActor::OnConstruction(const FTransform& Transform) {
+	UE_LOG(LogTemp, Warning, TEXT("Inside OnConstruction"));
+
+	DestroyStairs();
 
 	for (int i = 0; i < NumberOfSteps; i++) {
 		FString StairName = "Stair" + FString::FromInt(i);
@@ -135,6 +141,22 @@ void AStaircaseActor::OnConstruction(const FTransform& Transform) {
 
 						RailingLeftMeshComponent->SetRelativeLocation(FVector(0, -45, 50 + ((RailingTotalSize / (2 * StepTotalSize)) * 100)));
 						RailingRightMeshComponent->SetRelativeLocation(FVector(0, 45, 50 + ((RailingTotalSize / (2 * StepTotalSize)) * 100)));
+
+						// Handrail
+						double theta = atan((SourceMeshSize.Z * Dimensions.Z) / (SourceMeshSize.X * Dimensions.X));
+						double cosValue = cos(theta);
+						double lengthOfHandrail = ((SourceMeshSize.X * Dimensions.X) / cosValue);
+
+						UE_LOG(LogTemp, Warning, TEXT("Text, %lg %lg %lg"), theta, SourceMeshSize.Z * Dimensions.Z, SourceMeshSize.X * Dimensions.X);
+
+						HandrailLeftMeshComponent->SetWorldScale3D(FVector(lengthOfHandrail / (SourceMeshSize.X * Dimensions.X), 0.05 * 100 / RailingMeshSize.Y, 0.2 * 100 / RailingMeshSize.Z));
+						HandrailRightMeshComponent->SetWorldScale3D(FVector(lengthOfHandrail / (SourceMeshSize.X * Dimensions.X), 0.05 * 100 / RailingMeshSize.Y, 0.2 * 100 / RailingMeshSize.Z));
+
+						HandrailLeftMeshComponent->SetRelativeLocation(FVector(0, -45, ((RailingTotalSize / StepTotalSize) + 0.5) * 100));
+						HandrailRightMeshComponent->SetRelativeLocation(FVector(0, 45, ((RailingTotalSize / StepTotalSize) + 0.5) * 100));
+
+						HandrailLeftMeshComponent->SetRelativeRotation(FRotator(theta * 180 / PI, 0, 0));
+						HandrailRightMeshComponent->SetRelativeRotation(FRotator(theta * 180 / PI, 0, 0));
 					}
 					else if (StairType == EStaircaseType::ClosedStairs){
 						double RailingTotalSize = 100 * 5 * Dimensions.Z;
@@ -145,6 +167,22 @@ void AStaircaseActor::OnConstruction(const FTransform& Transform) {
 
 						RailingLeftMeshComponent->SetRelativeLocation(FVector(0, -45, (((RailingTotalSize - StepTotalSize) / (2 * StepTotalSize)) + 1) * 100));
 						RailingRightMeshComponent->SetRelativeLocation(FVector(0, 45, (((RailingTotalSize - StepTotalSize) / (2 * StepTotalSize)) + 1) * 100));
+
+						// Handrail
+						double theta = atan((SourceMeshSize.Z * Dimensions.Z) / (SourceMeshSize.X * Dimensions.X));
+						double cosValue = cos(theta);
+						double lengthOfHandrail = ((SourceMeshSize.X * Dimensions.X) / cosValue);
+
+						UE_LOG(LogTemp, Warning, TEXT("Text, %lg %lg %lg"), theta, SourceMeshSize.Z * Dimensions.Z, SourceMeshSize.X * Dimensions.X);
+
+						HandrailLeftMeshComponent->SetRelativeScale3D(FVector(lengthOfHandrail / (SourceMeshSize.X * Dimensions.X), 0.05 * 100 / RailingMeshSize.Y, 0.2 * 100 / RailingMeshSize.Z));
+						HandrailRightMeshComponent->SetRelativeScale3D(FVector(lengthOfHandrail / (SourceMeshSize.X * Dimensions.X), 0.05 * 100 / RailingMeshSize.Y, 0.2 * 100 / RailingMeshSize.Z));
+
+						HandrailLeftMeshComponent->SetRelativeLocation(FVector(0, -45, ((RailingTotalSize / StepTotalSize) + 0.5) * 100));
+						HandrailRightMeshComponent->SetRelativeLocation(FVector(0, 45, ((RailingTotalSize / StepTotalSize) + 0.5) * 100));
+
+						HandrailLeftMeshComponent->SetRelativeRotation(FRotator(theta * 180 / PI, 0, 0));
+						HandrailRightMeshComponent->SetRelativeRotation(FRotator(theta * 180 / PI, 0, 0));
 					}
 					else {
 						double RailingTotalSize = 100 * 5 * Dimensions.Z;
@@ -155,6 +193,27 @@ void AStaircaseActor::OnConstruction(const FTransform& Transform) {
 
 						RailingLeftMeshComponent->SetRelativeLocation(FVector(0, -45, (((RailingTotalSize - StepTotalSize) / (2 * StepTotalSize)) + 1) * 100));
 						RailingRightMeshComponent->SetRelativeLocation(FVector(0, 45, (((RailingTotalSize - StepTotalSize) / (2 * StepTotalSize)) + 1) * 100));
+
+						// Handrail
+						double lengthX = Dimensions.X + (((TranslationOffset.X / 100) - 1) * Dimensions.X);
+						double lengthZ = Dimensions.Z + (((TranslationOffset.Z / 100) - 1) * Dimensions.Z);
+
+						double theta = atan(lengthZ / lengthX);
+						double cosValue = cos(theta);
+						double lengthOfHandrail = ((SourceMeshSize.X * Dimensions.X) / cosValue);
+
+						double tanThetaOfOpenSpace = atan(TranslationOffset.Z / TranslationOffset.X);
+						double cosValueOfOpenSpace = cos(theta);
+						double lengthOfOpenSpace = (TranslationOffset.X / cosValueOfOpenSpace);
+
+						HandrailLeftMeshComponent->SetRelativeScale3D(FVector((lengthOfHandrail + lengthOfOpenSpace) / (SourceMeshSize.X * Dimensions.X * 1.5), 0.05 * 100 / RailingMeshSize.Y, 0.2 * 100 / RailingMeshSize.Z));
+						HandrailRightMeshComponent->SetRelativeScale3D(FVector((lengthOfHandrail + lengthOfOpenSpace) / (SourceMeshSize.X * Dimensions.X * 1.5), 0.05 * 100 / RailingMeshSize.Y, 0.2 * 100 / RailingMeshSize.Z));
+
+						HandrailLeftMeshComponent->SetRelativeLocation(FVector(0, -45, ((RailingTotalSize / StepTotalSize) + 0.5) * 100));
+						HandrailRightMeshComponent->SetRelativeLocation(FVector(0, 45, ((RailingTotalSize / StepTotalSize) + 0.5) * 100));
+
+						HandrailLeftMeshComponent->SetRelativeRotation(FRotator(theta * 180 / PI, 0, 0));
+						HandrailRightMeshComponent->SetRelativeRotation(FRotator(theta * 180 / PI, 0, 0));
 					}
 				}
 			}

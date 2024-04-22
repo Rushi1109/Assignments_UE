@@ -53,6 +53,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+	void DestroyStairs();
+
 	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite, Category = "Properties")
 	EStaircaseType StairType;
 
@@ -65,7 +67,7 @@ public:
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Properties")
 	FVector Dimensions;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Properties")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Properties", meta=(ClampMin = "100", UIMin = "100"))
 	FVector TranslationOffset;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Properties")
