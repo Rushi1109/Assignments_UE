@@ -6,8 +6,30 @@
 #include "GameFramework/Actor.h"
 #include "StaircaseActor.generated.h"
 
+USTRUCT(BlueprintType)
+struct FStaircaseStruct {
+	GENERATED_BODY()
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Properties")
+	UStaticMeshComponent* FloorComponent;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Properties")
+	UStaticMeshComponent* RailingLeftComponent;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Properties")
+	UStaticMeshComponent* RailingRightComponent;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Properties")
+	UStaticMeshComponent* HandrailLeftComponent;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Properties")
+	UStaticMeshComponent* HandrailRightComponent;
+
+	FStaircaseStruct();
+};
+
 UENUM()
-enum class EStaircaseEnum : int8 {
+enum class EStaircaseType : uint8 {
 	ClosedStairs UMETA(DisplayName = "Closed Stairs"),
 	OpenStairs UMETA(DisplayName = "Open Stairs"),
 	BoxStairs UMETA(DisplayName = "Box Stairs")
@@ -31,8 +53,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	UPROPERTY(EditAnyWhere, BluePrintReadWrite, Category = "Properties")
-	EStaircaseEnum StairType;
+	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite, Category = "Properties")
+	EStaircaseType StairType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties")
 	int NumberOfSteps;
@@ -47,7 +69,7 @@ public:
 	FVector TranslationOffset;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Properties")
-	TArray<UStaticMeshComponent*> StaticMeshComponents;
+	TArray<FStaircaseStruct> StaticMeshComponents;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Properties")
 	bool EnableRailing;
