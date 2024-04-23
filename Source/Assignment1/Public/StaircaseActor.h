@@ -67,7 +67,7 @@ public:
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Properties")
 	FVector Dimensions;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Properties", meta=(ClampMin = "100", UIMin = "100"))
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Properties", meta=(ClampMin = "100", UIMin = "100", EditCondition="StairType==EStaircaseType::OpenStairs"))
 	FVector TranslationOffset;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Properties")
