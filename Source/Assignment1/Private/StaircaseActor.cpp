@@ -149,8 +149,8 @@ void AStaircaseActor::OnConstruction(const FTransform& Transform) {
 
 						UE_LOG(LogTemp, Warning, TEXT("Text, %lg %lg %lg"), theta, SourceMeshSize.Z * Dimensions.Z, SourceMeshSize.X * Dimensions.X);
 
-						HandrailLeftMeshComponent->SetWorldScale3D(FVector(lengthOfHandrail / (SourceMeshSize.X * Dimensions.X), 0.05 * 100 / RailingMeshSize.Y, 0.2 * 100 / RailingMeshSize.Z));
-						HandrailRightMeshComponent->SetWorldScale3D(FVector(lengthOfHandrail / (SourceMeshSize.X * Dimensions.X), 0.05 * 100 / RailingMeshSize.Y, 0.2 * 100 / RailingMeshSize.Z));
+						HandrailLeftMeshComponent->SetWorldScale3D(FVector(lengthOfHandrail / (SourceMeshSize.X * Dimensions.X), 0.15 * 100 / RailingMeshSize.Y, 0.2 * 100 / RailingMeshSize.Z));
+						HandrailRightMeshComponent->SetWorldScale3D(FVector(lengthOfHandrail / (SourceMeshSize.X * Dimensions.X), 0.15 * 100 / RailingMeshSize.Y, 0.2 * 100 / RailingMeshSize.Z));
 
 						HandrailLeftMeshComponent->SetRelativeLocation(FVector(0, -45, ((RailingTotalSize / StepTotalSize) + 0.5) * 100));
 						HandrailRightMeshComponent->SetRelativeLocation(FVector(0, 45, ((RailingTotalSize / StepTotalSize) + 0.5) * 100));
