@@ -54,6 +54,7 @@ public:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	void DestroyStairs();
+	void CreateStairs();
 
 	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite, Category = "Properties")
 	EStaircaseType StairType;

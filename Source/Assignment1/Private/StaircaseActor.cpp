@@ -27,7 +27,6 @@ void AStaircaseActor::Tick(float DeltaTime)
 }
 
 void AStaircaseActor::DestroyStairs() {
-
 	for (int i = 0; i < StaticMeshComponents.Num(); i++) {
 		if (StaticMeshComponents[i].HandrailLeftComponent) {
 			StaticMeshComponents[i].HandrailLeftComponent->DestroyComponent();
@@ -54,11 +53,7 @@ void AStaircaseActor::DestroyStairs() {
 	StaticMeshComponents.Empty();
 }
 
-void AStaircaseActor::OnConstruction(const FTransform& Transform) {
-	UE_LOG(LogTemp, Warning, TEXT("Inside OnConstruction"));
-
-	DestroyStairs();
-
+void AStaircaseActor::CreateStairs() {
 	for (int i = 0; i < NumberOfSteps; i++) {
 		FString StairName = "Stair" + FString::FromInt(i);
 		UStaticMeshComponent* StepComponent = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), *StairName);
@@ -74,7 +69,7 @@ void AStaircaseActor::OnConstruction(const FTransform& Transform) {
 			StepComponent->SetStaticMesh(SourceMesh);
 
 			FVector SourceMeshSize = SourceMesh->GetBounds().GetBox().GetSize();
-			
+
 			switch (StairType)
 			{
 			case EStaircaseType::ClosedStairs:
@@ -86,7 +81,7 @@ void AStaircaseActor::OnConstruction(const FTransform& Transform) {
 				StepComponent->SetRelativeLocation(FVector(i * Dimensions.X * SourceMeshSize.X * (TranslationOffset.X / 100), 0, i * Dimensions.Z * SourceMeshSize.Z * (TranslationOffset.Z / 100)));
 				break;
 			case EStaircaseType::BoxStairs:
-				StepComponent->SetRelativeScale3D(FVector(Dimensions.X, Dimensions.Y, Dimensions.Z * (i+1)));
+				StepComponent->SetRelativeScale3D(FVector(Dimensions.X, Dimensions.Y, Dimensions.Z * (i + 1)));
 				StepComponent->SetRelativeLocation(FVector(i * Dimensions.X * SourceMeshSize.X, 0, i * Dimensions.Z * SourceMeshSize.Z / 2));
 				break;
 			default:
@@ -158,7 +153,7 @@ void AStaircaseActor::OnConstruction(const FTransform& Transform) {
 						HandrailLeftMeshComponent->SetRelativeRotation(FRotator(theta * 180 / PI, 0, 0));
 						HandrailRightMeshComponent->SetRelativeRotation(FRotator(theta * 180 / PI, 0, 0));
 					}
-					else if (StairType == EStaircaseType::ClosedStairs){
+					else if (StairType == EStaircaseType::ClosedStairs) {
 						double RailingTotalSize = 100 * 5 * Dimensions.Z;
 						double StepTotalSize = SourceMeshSize.Z * Dimensions.Z;
 
@@ -220,17 +215,15 @@ void AStaircaseActor::OnConstruction(const FTransform& Transform) {
 		}
 
 		StaticMeshComponents.Add(Staircase);
-
-
-		
-
-		
-		
-		//UE_LOG(LogTemp, Warning, TEXT("Left Railing offset: %s"), *(StepComponent->GetRelativeLocation().ToCompactString()));
-		//
-		
-		//UE_LOG(LogTemp, Warning, TEXT("Right Railing offset: %s"), *(StepComponent->GetRelativeLocation().ToCompactString()));
 	}
+}
+
+void AStaircaseActor::OnConstruction(const FTransform& Transform) {
+	UE_LOG(LogTemp, Warning, TEXT("Inside OnConstruction"));
+
+	DestroyStairs();
+	
+	CreateStairs();
 }
 
 FStaircaseStruct::FStaircaseStruct() : FloorComponent{ nullptr }, RailingLeftComponent{ nullptr }, RailingRightComponent{ nullptr }, HandrailLeftComponent{ nullptr }, HandrailRightComponent{ nullptr } {}
