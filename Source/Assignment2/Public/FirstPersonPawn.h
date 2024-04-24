@@ -4,7 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/FloatingPawnMovement.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+
+#include "InputMappingContext.h"
+#include "InputAction.h"
+
 #include "FirstPersonPawn.generated.h"
+
 
 UCLASS()
 class ASSIGNMENT2_API AFirstPersonPawn : public APawn
@@ -23,7 +31,35 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(VisibleDefaultsOnly)
+	USpringArmComponent* SpringArm;
+
+	UPROPERTY(VisibleDefaultsOnly)
+	UCameraComponent* Camera;
+
+	UPROPERTY(EditDefaultsOnly)
+	UCapsuleComponent* CapsuleComponent;
+
+	UPROPERTY()
+	UInputMappingContext* PawnMappingContext;
+
+	UPROPERTY()
+	UInputAction* MoveAction;
+
+	UPROPERTY()
+	UInputAction* LookAction;
+
+	UPROPERTY(VisibleAnywhere)
+	UFloatingPawnMovement* FloatingPawnMovement;
+
+	UPROPERTY(EditAnywhere)
+	float MoveScale;
+
+	void Move(const FInputActionValue& ActionValue);
+	void LookAround(const FInputActionValue& ActionValue);
 };

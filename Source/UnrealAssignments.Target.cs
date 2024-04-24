@@ -9,7 +9,7 @@ public class UnrealAssignmentsTarget : TargetRules
 	{
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
-		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_1;
+		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_2;
 		ExtraModuleNames.Add("UnrealAssignments");
 		ExtraModuleNames.Add("Assignment1");
 		ExtraModuleNames.Add("Assignment2");
