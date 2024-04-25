@@ -2,7 +2,7 @@
 
 
 #include "DynamicPawnController.h"
-#include "PawnDataTable.h"
+#include "GameFramework/GameModeBase.h"
 
 void ADynamicPawnController::BeginPlay()
 {
@@ -16,31 +16,25 @@ void ADynamicPawnController::SetupInputComponent()
 	InputComponent->BindAction("Spawn", IE_Pressed, this, &ADynamicPawnController::SpawnActor);
 }
 
-ADynamicPawnController::ADynamicPawnController() : PawnIndex{0} {}
+ADynamicPawnController::ADynamicPawnController() : PawnIndex{ 0 }, CurrentSpawnedPawn{ nullptr } {
+	DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Game/Assignment2/Assets/BP_PawnDataTable.BP_PawnDataTable'"));
+}
 
 void ADynamicPawnController::SpawnActor()
 {
-	UDataTable* DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Game/Assignment2/Assets/BP_PawnDataTable.BP_PawnDataTable'"));
-
 	if (DataTable) {
 		TArray<FName> RowNames = DataTable->GetRowNames();
 
-		if (CurrentlySpawnedPawn) {
-			CurrentlySpawnedPawn->Destroy();
-			CurrentlySpawnedPawn = nullptr;
-		}
-
-		if (PawnIndex == RowNames.Num()) {
-			PawnIndex = 0;
+		if (CurrentSpawnedPawn) {
+			CurrentSpawnedPawn->Destroy();
+			CurrentSpawnedPawn = nullptr;
 		}
 
 		FPawnDataTable* PawnDataTableRow = DataTable->FindRow<FPawnDataTable>(RowNames[PawnIndex], TEXT("RowKey"));
 
 		if (PawnDataTableRow) {
 			TSubclassOf<APawn> PawnReference = PawnDataTableRow->PawnReference;
-			EPawnType PawnType = PawnDataTableRow->PawnType;
-
-			UE_LOG(LogTemp, Warning, TEXT("%s"), PawnDataTableRow->PawnReference);
+			CurrentPawnType = PawnDataTableRow->PawnType;
 
 			FActorSpawnParameters SpawnActorParams;
 			SpawnActorParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -52,8 +46,16 @@ void ADynamicPawnController::SpawnActor()
 
 			if (SpawnedPawn) {
 				Possess(SpawnedPawn);
-				CurrentlySpawnedPawn = SpawnedPawn;
-				PawnIndex++;
+				
+				CurrentSpawnedPawn = SpawnedPawn;
+				PawnIndex = (PawnIndex+1)%RowNames.Num();
+
+				if (CurrentPawnType == EPawnType::TopDown) {
+					SetShowMouseCursor(true);
+				}
+				else {
+					SetShowMouseCursor(false);
+				}
 			}
 		}
 	}

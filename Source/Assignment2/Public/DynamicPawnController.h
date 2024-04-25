@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PawnDataTable.h"
 #include "GameFramework/PlayerController.h"
 #include "DynamicPawnController.generated.h"
 
@@ -24,5 +25,7 @@ public:
 
 private: 
 	int PawnIndex;
-	APawn* CurrentlySpawnedPawn;
+	APawn* CurrentSpawnedPawn;
+	EPawnType CurrentPawnType;
+	UDataTable* DataTable;
 };
