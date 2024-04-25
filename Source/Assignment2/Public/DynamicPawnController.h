@@ -15,9 +15,14 @@ class ASSIGNMENT2_API ADynamicPawnController : public APlayerController
 	GENERATED_BODY()
 	
 public:
+	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
+
 	ADynamicPawnController();
 
-	virtual void BeginPlay() override;
-
 	void SpawnActor();
+
+private: 
+	int PawnIndex;
+	APawn* CurrentlySpawnedPawn;
 };

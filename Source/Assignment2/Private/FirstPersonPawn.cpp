@@ -101,6 +101,7 @@ void AFirstPersonPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	check(LocalPlayer);
 
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+	Subsystem->ClearAllMappings();
 	Subsystem->AddMappingContext(PawnMappingContext, 0);
 }
 

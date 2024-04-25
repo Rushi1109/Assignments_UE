@@ -10,6 +10,7 @@
 UENUM(BlueprintType)
 enum class EPawnType : uint8 {
 	ThirdPerson UMETA(DisplayName = "Third Person"),
+	FirstPerson UMETA(DisplayName = "First Person"),
 	TopDown UMETA(DisplayName = "Top Down")
 };
 

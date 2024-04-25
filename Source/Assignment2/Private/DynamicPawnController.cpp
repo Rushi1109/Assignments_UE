@@ -9,9 +9,14 @@ void ADynamicPawnController::BeginPlay()
 	SpawnActor();
 }
 
-ADynamicPawnController::ADynamicPawnController()
+void ADynamicPawnController::SetupInputComponent()
 {
+	Super::SetupInputComponent();
+
+	InputComponent->BindAction("Spawn", IE_Pressed, this, &ADynamicPawnController::SpawnActor);
 }
+
+ADynamicPawnController::ADynamicPawnController() : PawnIndex{0} {}
 
 void ADynamicPawnController::SpawnActor()
 {
@@ -20,10 +25,20 @@ void ADynamicPawnController::SpawnActor()
 	if (DataTable) {
 		TArray<FName> RowNames = DataTable->GetRowNames();
 
-		FPawnDataTable* PawnDataTableRow = DataTable->FindRow<FPawnDataTable>(RowNames[0], TEXT("RowKey"));
+		if (CurrentlySpawnedPawn) {
+			CurrentlySpawnedPawn->Destroy();
+			CurrentlySpawnedPawn = nullptr;
+		}
+
+		if (PawnIndex == RowNames.Num()) {
+			PawnIndex = 0;
+		}
+
+		FPawnDataTable* PawnDataTableRow = DataTable->FindRow<FPawnDataTable>(RowNames[PawnIndex], TEXT("RowKey"));
 
 		if (PawnDataTableRow) {
 			TSubclassOf<APawn> PawnReference = PawnDataTableRow->PawnReference;
+			EPawnType PawnType = PawnDataTableRow->PawnType;
 
 			UE_LOG(LogTemp, Warning, TEXT("%s"), PawnDataTableRow->PawnReference);
 
@@ -36,10 +51,9 @@ void ADynamicPawnController::SpawnActor()
 			APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(PawnReference, SpawnActorLocation, SpawnActorRotation, SpawnActorParams);
 
 			if (SpawnedPawn) {
-				UE_LOG(LogTemp, Warning, TEXT("PAWN SPAWNED"));
-
 				Possess(SpawnedPawn);
-				
+				CurrentlySpawnedPawn = SpawnedPawn;
+				PawnIndex++;
 			}
 		}
 	}
