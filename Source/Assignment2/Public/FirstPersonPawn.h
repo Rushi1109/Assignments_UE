@@ -13,7 +13,6 @@
 
 #include "FirstPersonPawn.generated.h"
 
-
 UCLASS()
 class ASSIGNMENT2_API AFirstPersonPawn : public APawn
 {
@@ -36,28 +35,20 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(VisibleDefaultsOnly)
-	USpringArmComponent* SpringArm;
-
-	UPROPERTY(VisibleDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly)
 	UCameraComponent* Camera;
 
 	UPROPERTY(EditDefaultsOnly)
 	UCapsuleComponent* CapsuleComponent;
 
-	UPROPERTY()
 	UInputMappingContext* PawnMappingContext;
-
-	UPROPERTY()
 	UInputAction* MoveAction;
-
-	UPROPERTY()
 	UInputAction* LookAction;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	UFloatingPawnMovement* FloatingPawnMovement;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float MoveScale;
 
 	void Move(const FInputActionValue& ActionValue);

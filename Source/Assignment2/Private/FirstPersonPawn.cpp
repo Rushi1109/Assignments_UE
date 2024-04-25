@@ -15,6 +15,8 @@ AFirstPersonPawn::AFirstPersonPawn() : PawnMappingContext{ nullptr }, MoveAction
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
 	CapsuleComponent->SetCapsuleRadius(40);
 	CapsuleComponent->SetCapsuleHalfHeight(90);
+	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CapsuleComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 	//CapsuleComponent->SetEnableGravity(true);
 	//CapsuleComponent->SetSimulatePhysics(true);
 	SetRootComponent(CapsuleComponent);
@@ -22,7 +24,7 @@ AFirstPersonPawn::AFirstPersonPawn() : PawnMappingContext{ nullptr }, MoveAction
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->bHiddenInGame = false;
 	Camera->bUsePawnControlRotation = true;
-	Camera->SetupAttachment(CapsuleComponent, USpringArmComponent::SocketName);
+	Camera->SetupAttachment(CapsuleComponent);
 
 	FloatingPawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Movement"));
 }
@@ -111,7 +113,7 @@ void AFirstPersonPawn::LookAround(const FInputActionValue& ActionValue)
 
 void AFirstPersonPawn::Move(const FInputActionValue& ActionValue)
 {
-	FVector MovementInput = ActionValue.Get<FInputActionValue::Axis3D>();
+	FVector MovementInput = ActionValue.Get<FVector>();
 
 	AddMovementInput(GetControlRotation().RotateVector(MovementInput), MoveScale);
 }
