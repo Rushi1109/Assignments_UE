@@ -4,6 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "PawnDataTable.h"
+#include "InputAction.h"
+#include "InputMappingContext.h"
+#include "PawnAttributeAsset.h"
+#include "BaseCharacter.h"
+#include "FirstPersonPawn.h"
 #include "GameFramework/PlayerController.h"
 #include "DynamicPawnController.generated.h"
 
@@ -22,6 +27,15 @@ public:
 	ADynamicPawnController();
 
 	void SpawnActor();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UInputMappingContext* PawnMappingContext;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UInputAction* SwapAction;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void DisplayAttributes(UPawnAttributeAsset* PawnAttributeAsset);
 
 private: 
 	int PawnIndex;
