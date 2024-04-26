@@ -12,19 +12,23 @@ AFirstPersonPawn::AFirstPersonPawn() : PawnMappingContext{ nullptr }, MoveAction
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
-	CapsuleComponent->SetCapsuleRadius(40);
-	CapsuleComponent->SetCapsuleHalfHeight(90);
+	CollisionCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
+	CollisionCapsuleComponent->SetCapsuleRadius(40);
+	CollisionCapsuleComponent->SetCapsuleHalfHeight(90);
+	CollisionCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CollisionCapsuleComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 	//CapsuleComponent->SetEnableGravity(true);
 	//CapsuleComponent->SetSimulatePhysics(true);
-	SetRootComponent(CapsuleComponent);
+	SetRootComponent(CollisionCapsuleComponent);
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->bHiddenInGame = false;
 	Camera->bUsePawnControlRotation = true;
-	Camera->SetupAttachment(CapsuleComponent, USpringArmComponent::SocketName);
+	Camera->SetupAttachment(CollisionCapsuleComponent);
 
 	FloatingPawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Movement"));
+
+	PawnAttributeAsset = LoadObject<UPawnAttributeAsset>(this, TEXT("/Script/Assignment2.PawnAttributeAsset'/Game/Assignment2/Assets/BP_FirstPersonPawnAttributes.BP_FirstPersonPawnAttributes'"));
 }
 
 // Called when the game starts or when spawned
@@ -93,7 +97,7 @@ void AFirstPersonPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	EIC->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AFirstPersonPawn::Move);
 	EIC->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFirstPersonPawn::LookAround);
 
-	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	check(PlayerController)
 	ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
 	check(LocalPlayer);
@@ -111,7 +115,7 @@ void AFirstPersonPawn::LookAround(const FInputActionValue& ActionValue)
 
 void AFirstPersonPawn::Move(const FInputActionValue& ActionValue)
 {
-	FVector MovementInput = ActionValue.Get<FInputActionValue::Axis3D>();
+	FVector MovementInput = ActionValue.Get<FVector>();
 
 	AddMovementInput(GetControlRotation().RotateVector(MovementInput), MoveScale);
 }
