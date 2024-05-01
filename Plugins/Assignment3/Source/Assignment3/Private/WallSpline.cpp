@@ -4,8 +4,7 @@
 #include "WallSpline.h"
 
 // Sets default values
-AWallSpline::AWallSpline()
-{
+AWallSpline::AWallSpline() {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -14,13 +13,17 @@ AWallSpline::AWallSpline()
 
 	SplineComponent = CreateDefaultSubobject<USplineComponent>(TEXT("Actor Spline Component"));
 	SplineComponent->SetupAttachment(RootComponent);
+	SplineComponent->ClearSplinePoints();
+
+	SourceMesh = LoadObject<UStaticMesh>(this, TEXT("/Script/Engine.StaticMesh'/Game/StarterContent/Architecture/Wall_400x200.Wall_400x200'"));
+	SourceMeshMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Script/Engine.Material'/Engine/MaterialTemplates/VertexAnimation/AdvancedFlag.AdvancedFlag'"));
 }
 
 // Called when the game starts or when spawned
 void AWallSpline::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -28,12 +31,6 @@ void AWallSpline::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-void AWallSpline::OnConstruction(const FTransform& Transform) {
-	DestroySpline();
-
-	GenerateSpline();
 }
 
 void AWallSpline::DestroySpline() {
@@ -61,11 +58,25 @@ void AWallSpline::GenerateSpline() {
 		USplineMeshComponent* MeshComponent = NewObject<USplineMeshComponent>(this, USplineMeshComponent::StaticClass());
 		MeshComponent->RegisterComponent();
 		if (SourceMesh) {
+			MeshComponent->SetMobility(EComponentMobility::Movable);
 			MeshComponent->SetStaticMesh(SourceMesh);
+			if (SourceMeshMaterial) {
+				UE_LOG(LogTemp, Warning, TEXT("Mesh Material Set"));
+				MeshComponent->SetMaterial(0, SourceMeshMaterial);
+			}
 		}
 		MeshComponent->SetStartAndEnd(StartPosition, StartTangent, EndPosition, EndTangent, true);
 		MeshComponent->SetupAttachment(SplineComponent);
-
+		
 		SplineComponentsArray.Add(MeshComponent);
 	}
+}
+
+void AWallSpline::CreateWall(FVector& Location) {
+	UE_LOG(LogTemp, Warning, TEXT("Location : %s"), *Location.ToString());
+	SplineComponent->AddSplinePoint(Location, ESplineCoordinateSpace::World, true);
+
+	DestroySpline();
+
+	GenerateSpline();
 }

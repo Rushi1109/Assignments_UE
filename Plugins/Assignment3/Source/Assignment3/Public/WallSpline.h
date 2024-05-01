@@ -24,11 +24,10 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void OnConstruction(const FTransform& Transform) override;
 
 	void DestroySpline();
-
 	void GenerateSpline();
+	void CreateWall(FVector& Location);
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Root")
 	USceneComponent* SceneComponent;
@@ -38,6 +37,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties")
 	UStaticMesh* SourceMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties")
+	UMaterialInterface* SourceMeshMaterial;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Properties")
 	TArray<USplineMeshComponent*> SplineComponentsArray;
