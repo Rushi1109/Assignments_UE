@@ -25,9 +25,17 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
 	void DestroySpline();
+
+	UFUNCTION(BlueprintCallable)
 	void GenerateSpline();
+
+	UFUNCTION(BlueprintCallable)
 	void CreateWall(FVector& Location);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveLastSplinePoint();
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Root")
 	USceneComponent* SceneComponent;
@@ -39,7 +47,7 @@ public:
 	UStaticMesh* SourceMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties")
-	UMaterialInterface* SourceMeshMaterial;
+	UMaterial* SourceMeshMaterial;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Properties")
 	TArray<USplineMeshComponent*> SplineComponentsArray;

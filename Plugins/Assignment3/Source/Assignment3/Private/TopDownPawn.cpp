@@ -23,11 +23,14 @@ ATopDownPawn::ATopDownPawn() {
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
-	SpringArm->TargetArmLength = 700.0f;
-	SpringArm->SetRelativeRotation(FRotator(-70.0f, 0.0f, 0.0f));
-
+	SpringArm->TargetArmLength = 600.0f;
+	SpringArm->TargetOffset.Z = 1050.00;
+	
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm, SpringArm->SocketName);
+
+	float CameraPitchRotation = FMath::RadiansToDegrees(atan(SpringArm->TargetOffset.Z / SpringArm->TargetArmLength));
+	Camera->SetRelativeRotation(FRotator(-1 * CameraPitchRotation, 0.0, 0.0));
 
 	FloatingPawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Floating Pawn Movement"));
 }
@@ -95,14 +98,24 @@ void ATopDownPawn::PawnMovement(const FInputActionValue& ActionValue) {
 void ATopDownPawn::ScrollWheelMovement(const FInputActionValue& ActionValue) {
 	float ScrollWheelScale = ActionValue.Get<FInputActionValue::Axis1D>();
 
-	if (SpringArm->TargetArmLength >= 500.f) {
-		float NewArmLength = SpringArm->TargetArmLength + (ScrollWheelScale*25);
-		SpringArm->TargetArmLength = NewArmLength;
+	if (SpringArm->TargetOffset.Z > 0) {
+		SpringArm->TargetOffset.Z += ScrollWheelScale * 50;
+		if (SpringArm->TargetOffset.Z <= 500) {
+			SpringArm->TargetArmLength += ScrollWheelScale * 25;
+		}
 
-		UE_LOG(LogTemp, Warning, TEXT("NewArmLength: %f"), NewArmLength);
+		SpringArm->TargetOffset.Z = FMath::Clamp(SpringArm->TargetOffset.Z, 0, 5000);
+		SpringArm->TargetArmLength = FMath::Clamp(SpringArm->TargetArmLength, 350.f, 600.f);
+		
+		float CameraPitchRotation = FMath::RadiansToDegrees(atan(SpringArm->TargetOffset.Z / SpringArm->TargetArmLength));
+		Camera->SetRelativeRotation(FRotator(-1 * CameraPitchRotation, 0.0, 0.0));
 	}
-	//else {
-	//	float SinAngle = 
-	//}
+	else if (SpringArm->TargetArmLength <= 350.000000) {
+		SpringArm->TargetArmLength += ScrollWheelScale * 25;
+		SpringArm->TargetArmLength = FMath::Clamp(SpringArm->TargetArmLength, 150.f, 400.f);
+	}
+	else {
+		SpringArm->TargetOffset.Z += ScrollWheelScale * 50;
+	}
 }
 
