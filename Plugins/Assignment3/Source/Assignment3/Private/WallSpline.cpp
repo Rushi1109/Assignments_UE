@@ -45,6 +45,12 @@ void AWallSpline::DestroySpline() {
 	}
 
 	SplineComponentsArray.Empty();
+
+	int32 NumberOfSplinePoints = SplineComponent->GetNumberOfSplinePoints();
+
+	for (int32 i = NumberOfSplinePoints; i > 0; --i) {
+		SplineComponent->RemoveSplinePoint(i - 1);
+	}
 }
 
 void AWallSpline::GenerateSpline() {
@@ -93,7 +99,7 @@ void AWallSpline::RemoveLastSplinePoint() {
 		SplineMeshComponent->DestroyComponent();
 	}
 	
-	if (NumberOfSplinePoints - 1) {
+	if (NumberOfSplinePoints) {
 		SplineComponent->RemoveSplinePoint(NumberOfSplinePoints - 1);
 	}
 }

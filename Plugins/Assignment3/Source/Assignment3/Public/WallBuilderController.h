@@ -9,6 +9,8 @@
 #include "InputMappingContext.h"
 #include "WallBuilderController.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(NotificationDelegate, const FString&);
+
 /**
  * 
  */
@@ -19,9 +21,9 @@ class ASSIGNMENT3_API AWallBuilderController : public APlayerController
 	
 public:
 	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
 
 	AWallBuilderController();
-	virtual void SetupInputComponent() override;
 
 	void LeftClickHandle(const FInputActionValue& ActionValue);
 	void RightClickHandle(const FInputActionValue& ActionValue);
@@ -38,12 +40,17 @@ public:
 	UInputAction* DeleteLastSplineWallAction;
 	UInputMappingContext* MappingContext;
 
+	NotificationDelegate Notification;
+
 	UPROPERTY(VisibleAnywhere)
 	TArray<AWallSpline*> ArrayWallSpline;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Spline")
 	TSubclassOf<AWallSpline> SplineType;
 
-	UPROPERTY()
-	int WallIndex;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spline")
+	int32 SplineWallIndex;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void PrintMessageOnViewPort(const FString& Message);
 };

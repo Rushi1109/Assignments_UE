@@ -12,13 +12,15 @@ void AWallBuilderController::BeginPlay() {
 	SetShowMouseCursor(true);
 	SetInputMode(FInputModeGameAndUI());
 
+	Notification.AddUFunction(this, "PrintMessageOnViewPort");
 	if (SplineType) {
 		AWallSpline* WallSpline = NewObject<AWallSpline>(this, SplineType, TEXT("Wall Spline 0"));
 		ArrayWallSpline.Add(WallSpline);
 	}
+	Notification.Broadcast(FString{ "New Wall Spline Started" });
 }
 
-AWallBuilderController::AWallBuilderController() : LeftClickAction{ nullptr }, RightClickAction{ nullptr }, SelectPreviousWallAction{ nullptr }, SelectNextWallAction{ nullptr }, MappingContext { nullptr }, WallIndex{ 0 } {}
+AWallBuilderController::AWallBuilderController() : LeftClickAction{ nullptr }, RightClickAction{ nullptr }, SelectPreviousWallAction{ nullptr }, SelectNextWallAction{ nullptr }, DestroySplineWallAction{ nullptr }, DeleteLastSplineWallAction{ nullptr }, MappingContext { nullptr }, SplineWallIndex{ 0 } {}
 
 void AWallBuilderController::SetupInputComponent() {
 	Super::SetupInputComponent();
@@ -67,39 +69,46 @@ void AWallBuilderController::LeftClickHandle(const FInputActionValue& ActionValu
 	GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, HitResult);
 
 	if (HitResult.bBlockingHit) {
-		ArrayWallSpline[WallIndex]->CreateWall(HitResult.Location);
+		ArrayWallSpline[SplineWallIndex]->CreateWall(HitResult.Location);
 	}
 }
 
 void AWallBuilderController::RightClickHandle(const FInputActionValue& ActionValue) {
-	WallIndex++;
-	FString WallSplineName = "Wall Spline " + FString::FromInt(WallIndex);
-
+	SplineWallIndex++;
+	FString WallSplineName = "Wall Spline " + FString::FromInt(SplineWallIndex);
 
 	if (SplineType) {
 		AWallSpline* WallSpline = NewObject<AWallSpline>(this, SplineType, *WallSplineName);
 		ArrayWallSpline.Add(WallSpline);
 	}
+
+	Notification.Broadcast(FString{ "New Wall Spline Started" });
 }
 
 void AWallBuilderController::SelectPreviousWallHandle(const FInputActionValue& ActionValue) {
-	if (WallIndex > 0) {
-		WallIndex--;
+	if (SplineWallIndex > 0) {
+		--SplineWallIndex;
 	}
-	return;
+
+	Notification.Broadcast(FString{ "Selected Spline Wall: " } + FString::FromInt(SplineWallIndex));
 }
 
 void AWallBuilderController::SelectNextWallHandle(const FInputActionValue& ActionValue) {
-	if (WallIndex < ArrayWallSpline.Num() - 1) {
-		WallIndex++;
+	if (SplineWallIndex < ArrayWallSpline.Num() - 1) {
+		++SplineWallIndex;
 	}
-	return;
+
+	Notification.Broadcast(FString{ "Selected Spline Wall: " } + FString::FromInt(SplineWallIndex));
 }
 
 void AWallBuilderController::DestroySplineWallHandle(const FInputActionValue& ActionValue) {
-	ArrayWallSpline[WallIndex]->DestroySpline();
+	ArrayWallSpline[SplineWallIndex]->DestroySpline();
+
+	Notification.Broadcast(FString{ "Destroyed Spline Wall: " } + FString::FromInt(SplineWallIndex));
 }
 
 void AWallBuilderController::DeleteLastSplineWallHandle(const FInputActionValue& ActionValue) {
-	ArrayWallSpline[WallIndex]->RemoveLastSplinePoint();
+	ArrayWallSpline[SplineWallIndex]->RemoveLastSplinePoint();
+
+	Notification.Broadcast(FString{ "Deleted Last Spline Point of Wall: " } + FString::FromInt(SplineWallIndex));
 }
