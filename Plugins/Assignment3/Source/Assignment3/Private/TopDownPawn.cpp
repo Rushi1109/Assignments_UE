@@ -11,11 +11,8 @@ ATopDownPawn::ATopDownPawn() {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CollisionCapsule"));
-	SetRootComponent(CapsuleComponent);
-	CapsuleComponent->InitCapsuleSize(42.f, 96.0f);
-	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	CapsuleComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
+	SetRootComponent(SceneComponent);
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;

@@ -36,7 +36,7 @@ public:
 	void ScrollWheelMovement(const FInputActionValue& ActionValue);
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Properties")
-	UCapsuleComponent* CapsuleComponent;
+	USceneComponent* SceneComponent;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Properties")
 	USpringArmComponent* SpringArm;
