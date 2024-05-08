@@ -16,8 +16,8 @@ void AWallBuilderController::BeginPlay() {
 	if (SplineType) {
 		AWallSpline* WallSpline = NewObject<AWallSpline>(this, SplineType, TEXT("Wall Spline 0"));
 		ArrayWallSpline.Add(WallSpline);
+		Notification.Broadcast(FString{ "New Wall Spline Started" });
 	}
-	Notification.Broadcast(FString{ "New Wall Spline Started" });
 }
 
 AWallBuilderController::AWallBuilderController() : LeftClickAction{ nullptr }, RightClickAction{ nullptr }, SelectPreviousWallAction{ nullptr }, SelectNextWallAction{ nullptr }, DestroySplineWallAction{ nullptr }, DeleteLastSplineWallAction{ nullptr }, MappingContext { nullptr }, SplineWallIndex{ 0 } {}
@@ -102,7 +102,9 @@ void AWallBuilderController::SelectNextWallHandle(const FInputActionValue& Actio
 }
 
 void AWallBuilderController::DestroySplineWallHandle(const FInputActionValue& ActionValue) {
-	ArrayWallSpline[SplineWallIndex]->DestroySpline();
+	if (ArrayWallSpline[SplineWallIndex]) {
+		ArrayWallSpline[SplineWallIndex]->DestroySpline();
+	}
 
 	Notification.Broadcast(FString{ "Destroyed Spline Wall: " } + FString::FromInt(SplineWallIndex));
 }
@@ -111,4 +113,12 @@ void AWallBuilderController::DeleteLastSplineWallHandle(const FInputActionValue&
 	ArrayWallSpline[SplineWallIndex]->RemoveLastSplinePoint();
 
 	Notification.Broadcast(FString{ "Deleted Last Spline Point of Wall: " } + FString::FromInt(SplineWallIndex));
+}
+
+void AWallBuilderController::DestroyAllSplineWall() {
+	for (int i = 0; i < ArrayWallSpline.Num(); i++) {
+		ArrayWallSpline[i]->DestroySpline();
+	}
+
+	Notification.Broadcast("Destroyed All Spline Walls");
 }
