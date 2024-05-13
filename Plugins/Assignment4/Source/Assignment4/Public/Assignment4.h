@@ -5,8 +5,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-class FAssignment4Module : public IModuleInterface
-{
+class FAssignment4Module : public IModuleInterface {
 public:
 
 	/** IModuleInterface implementation */
