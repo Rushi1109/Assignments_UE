@@ -20,7 +20,7 @@ public:
 	UMeshAssetManager* MeshAssetManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MeshAssetManager")
-	TEnumAsByte<EAssetType> ScrollBoxAssetType;
+	EAssetType ScrollBoxAssetType;
 
 protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;

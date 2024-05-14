@@ -9,7 +9,7 @@
 #include "Brushes/SlateColorBrush.h"
 
 UENUM()
-enum class EAssetType : int8 {
+enum class EAssetType : uint8 {
 	MeshData UMETA(DisplayName = "Mesh Data"),
 	MaterialData UMETA(DisplayName = "Material Data"),
 	TextureData UMETA(DisplayName = "Texture Data")
@@ -34,7 +34,7 @@ public:
 	void LoadMaterialData();
 	void LoadTextureData();
 
-	TEnumAsByte<EAssetType> AssetType;
+	EAssetType AssetType;
 	TWeakObjectPtr<UMeshAssetManager> MeshAssetManager;
 	TSharedPtr<SScrollBox> ScrollBox;
 };

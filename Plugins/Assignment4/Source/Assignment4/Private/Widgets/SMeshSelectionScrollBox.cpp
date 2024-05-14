@@ -53,6 +53,13 @@ void SMeshSelectionScrollBox::LoadMeshData() {
 
 			if (MeshData.MeshThumbnail) {
 				FSlateBrush* ThumbnailBrush = new FSlateBrush();
+				ThumbnailBrush->DrawAs = ESlateBrushDrawType::RoundedBox;
+
+				FSlateBrushOutlineSettings OutlineSettings{};
+				OutlineSettings.CornerRadii = FVector4{ 5.f };
+				OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
+				ThumbnailBrush->OutlineSettings = OutlineSettings;
+				
 				ThumbnailBrush->SetResourceObject(MeshData.MeshThumbnail);
 				ThumbnailBrush->SetImageSize(FVector2D(MeshData.MeshThumbnail->GetSizeX(), MeshData.MeshThumbnail->GetSizeY()));
 
@@ -66,14 +73,14 @@ void SMeshSelectionScrollBox::LoadMeshData() {
 
 							return FReply::Unhandled();
 						}
-				);;
+				);
 
 				TSharedPtr<STextBlock> ThumbnailName = SNew(STextBlock).Text(FText::FromString(MeshData.MeshName)).ColorAndOpacity(FLinearColor{ 0.f, 0.f, 0.f });
 
 				BorderBox->SetContent(ThumbnailImage.ToSharedRef());
 				SizeBox->SetContent(BorderBox.ToSharedRef());
 
-				VerticleBox->AddSlot()
+				VerticleBox->AddSlot().Padding(FMargin{ 5.f })
 					[
 						SizeBox.ToSharedRef()
 					];
@@ -127,7 +134,7 @@ void SMeshSelectionScrollBox::LoadMaterialData() {
 				BorderBox->SetContent(ThumbnailImage.ToSharedRef());
 				SizeBox->SetContent(BorderBox.ToSharedRef());
 
-				VerticleBox->AddSlot()
+				VerticleBox->AddSlot().Padding(FMargin{ 5.f })
 					[
 						SizeBox.ToSharedRef()
 					];
@@ -181,7 +188,7 @@ void SMeshSelectionScrollBox::LoadTextureData() {
 				BorderBox->SetContent(ThumbnailImage.ToSharedRef());
 				SizeBox->SetContent(BorderBox.ToSharedRef());
 
-				VerticleBox->AddSlot()
+				VerticleBox->AddSlot().Padding(FMargin{ 5.f })
 					[
 						SizeBox.ToSharedRef()
 					];
