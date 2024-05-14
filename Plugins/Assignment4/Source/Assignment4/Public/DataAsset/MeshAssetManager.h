@@ -11,10 +11,13 @@ struct FMeshData {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MeshData")
-	FText MeshName;
+	FString MeshName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MeshData")
 	UStaticMesh* MeshAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MeshData")
+	UTexture2D* MeshThumbnail;
 };
 
 USTRUCT(BlueprintType)
@@ -22,13 +25,13 @@ struct FMaterialData {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MaterialData")
-	FText MaterialName;
+	FString MaterialName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MaterialData")
-	UMaterial* MaterialAsset;
+	UMaterialInterface* MaterialAsset;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MaterialData")
-	float Roughness;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TextureData")
+	UTexture2D* MaterialThumbnail;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MaterialData")
 	FLinearColor MaterialColor;
@@ -39,7 +42,7 @@ struct FTextureData {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TextureData")
-	FText TextureName;
+	FString TextureName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TextureData")
 	UTexture* TextureAsset;
