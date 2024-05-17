@@ -12,8 +12,7 @@
  * 
  */
 UCLASS()
-class ASSIGNMENT4_API USelectionWidget : public UUserWidget
-{
+class ASSIGNMENT4_API USelectionWidget : public UUserWidget {
 	GENERATED_BODY()
 	
 public:
@@ -21,13 +20,13 @@ public:
 	UCanvasPanel* Canvas;
 
 	UPROPERTY(meta = (BindWidget))
-	UMeshSelectionScrollBox* MeshSelectionScrollBox;
+	UMeshSelectionScrollBox* ScrollBox1;
 
 	UPROPERTY(meta = (BindWidget))
-	UMeshSelectionScrollBox* MaterialSelectionScrollBox;
+	UMeshSelectionScrollBox* ScrollBox2;
 
 	UPROPERTY(meta = (BindWidget))
-	UMeshSelectionScrollBox* TextureSelectionScrollBox;
+	UMeshSelectionScrollBox* ScrollBox3;
 
 	virtual void NativeConstruct() override;
 };

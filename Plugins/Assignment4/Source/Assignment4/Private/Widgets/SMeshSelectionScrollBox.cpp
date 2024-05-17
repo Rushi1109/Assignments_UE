@@ -36,6 +36,17 @@ void SMeshSelectionScrollBox::LoadAssetInScrollBox() {
 	}
 }
 
+FSlateFontInfo GetFontInfo() {
+	FSlateFontInfo SlateFont;
+	UObject* FontObj = LoadObject<UObject>(nullptr, TEXT("/Script/Engine.Font'/Assignment4/Fonts/Montserrat-Bold_Font.Montserrat-Bold_Font'"));
+	if (FontObj) {
+		SlateFont.FontObject = FontObj;
+		SlateFont.Size = 16.f;
+	}
+
+	return SlateFont;
+}
+
 void SMeshSelectionScrollBox::LoadMeshData() {
 	ScrollBox->ClearChildren();
 
@@ -67,7 +78,7 @@ void SMeshSelectionScrollBox::LoadMeshData() {
 					.OnMouseButtonDown_Lambda(
 						[this, MeshData](const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) {
 							if (MouseEvent.GetEffectingButton() == EKeys::LeftMouseButton) {
-								// TODO: Execute the delegate
+								OnMeshAssetSelected.ExecuteIfBound(MeshData);
 								return FReply::Handled();
 							}
 
@@ -75,10 +86,12 @@ void SMeshSelectionScrollBox::LoadMeshData() {
 						}
 				);
 
-				TSharedPtr<STextBlock> ThumbnailName = SNew(STextBlock).Text(FText::FromString(MeshData.MeshName)).ColorAndOpacity(FLinearColor{ 0.f, 0.f, 0.f });
-
 				BorderBox->SetContent(ThumbnailImage.ToSharedRef());
 				SizeBox->SetContent(BorderBox.ToSharedRef());
+
+				TSharedPtr<STextBlock> ThumbnailName = SNew(STextBlock).Text(FText::FromString(MeshData.MeshName)).ColorAndOpacity(FLinearColor{ 0.f, 0.f, 0.f });
+				FSlateFontInfo FontInfo = GetFontInfo();
+				ThumbnailName->SetFont(FontInfo);
 
 				VerticleBox->AddSlot().Padding(FMargin{ 5.f })
 					[
@@ -121,19 +134,21 @@ void SMeshSelectionScrollBox::LoadMaterialData() {
 					.OnMouseButtonDown_Lambda(
 						[this, MaterialData](const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) {
 							if (MouseEvent.GetEffectingButton() == EKeys::LeftMouseButton) {
-								// TODO: Execute the delegate
+								OnMaterialAssetSelected.ExecuteIfBound(MaterialData);
 								return FReply::Handled();
 							}
 
 							return FReply::Unhandled();
 						}
-				);;
-
-				TSharedPtr<STextBlock> ThumbnailName = SNew(STextBlock).Text(FText::FromString(MaterialData.MaterialName)).ColorAndOpacity(FLinearColor{ 0.f, 0.f, 0.f });
+				);
 
 				BorderBox->SetContent(ThumbnailImage.ToSharedRef());
 				SizeBox->SetContent(BorderBox.ToSharedRef());
 
+				TSharedPtr<STextBlock> ThumbnailName = SNew(STextBlock).Text(FText::FromString(MaterialData.MaterialName)).ColorAndOpacity(FLinearColor{ 0.f, 0.f, 0.f });
+				FSlateFontInfo FontInfo = GetFontInfo();
+				ThumbnailName->SetFont(FontInfo);
+			
 				VerticleBox->AddSlot().Padding(FMargin{ 5.f })
 					[
 						SizeBox.ToSharedRef()
@@ -175,18 +190,20 @@ void SMeshSelectionScrollBox::LoadTextureData() {
 					.OnMouseButtonDown_Lambda(
 						[this, TextureData](const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) {
 							if (MouseEvent.GetEffectingButton() == EKeys::LeftMouseButton) {
-								// TODO: Execute the delegate
+								OnTextureAssetSelected.ExecuteIfBound(TextureData);
 								return FReply::Handled();
 							}
 
 							return FReply::Unhandled();
 						}
-				);;
-
-				TSharedPtr<STextBlock> ThumbnailName = SNew(STextBlock).Text(FText::FromString(TextureData.TextureName)).ColorAndOpacity(FLinearColor{0.f, 0.f, 0.f});
+				);
 
 				BorderBox->SetContent(ThumbnailImage.ToSharedRef());
 				SizeBox->SetContent(BorderBox.ToSharedRef());
+
+				TSharedPtr<STextBlock> ThumbnailName = SNew(STextBlock).Text(FText::FromString(TextureData.TextureName)).ColorAndOpacity(FLinearColor{ 0.f, 0.f, 0.f });
+				FSlateFontInfo FontInfo = GetFontInfo();
+				ThumbnailName->SetFont(FontInfo);
 
 				VerticleBox->AddSlot().Padding(FMargin{ 5.f })
 					[
@@ -205,5 +222,7 @@ void SMeshSelectionScrollBox::LoadTextureData() {
 		}
 	}
 }
+
+
 
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION

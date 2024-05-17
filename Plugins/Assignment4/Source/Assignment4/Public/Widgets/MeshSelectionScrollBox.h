@@ -7,6 +7,9 @@
 #include "SMeshSelectionScrollBox.h"
 #include "MeshSelectionScrollBox.generated.h"
 
+DECLARE_DELEGATE_OneParam(FOnMeshAssetReceived, const FMeshData&)
+DECLARE_DELEGATE_OneParam(FOnMaterialAssetReceived, const FMaterialData&)
+DECLARE_DELEGATE_OneParam(FOnTextureAssetReceived, const FTextureData&)
 
 /**
  * 
@@ -22,6 +25,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MeshAssetManager")
 	EAssetType ScrollBoxAssetType;
 
+	FOnMeshAssetReceived OnMeshAssetReceived;
+	FOnMaterialAssetReceived OnMaterialAssetReceived;
+	FOnTextureAssetReceived OnTextureAssetReceived;
+
+	TSharedPtr<SMeshSelectionScrollBox> GetMeshSelectionScrollBox();
+
 protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
@@ -29,5 +38,17 @@ protected:
 	const virtual FText GetPaletteCategory() override;
 	virtual void SynchronizeProperties() override;
 private:
+	UFUNCTION()
+	void HandleMeshAssetReceived(const FMeshData& MeshData);
+
+	UFUNCTION()
+	void HandleMaterialAssetReceived(const FMaterialData& MaterialData);
+
+	UFUNCTION()
+	void HandleTextureAssetReceived(const FTextureData& TextureData);
+	const FText GetTitleTextFromEnum();
+
+
+
 	TSharedPtr<SMeshSelectionScrollBox> MeshSelectionScrollBox;
 };

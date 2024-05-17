@@ -15,6 +15,11 @@ enum class EAssetType : uint8 {
 	TextureData UMETA(DisplayName = "Texture Data")
 };
 
+DECLARE_DELEGATE_OneParam(FOnMeshAssetSelected, const FMeshData&);
+DECLARE_DELEGATE_OneParam(FOnMaterialAssetSelected, const FMaterialData&);
+DECLARE_DELEGATE_OneParam(FOnTextureAssetSelected, const FTextureData&);
+
+FSlateFontInfo GetFontInfo();
 /**
  * 
  */
@@ -37,4 +42,8 @@ public:
 	EAssetType AssetType;
 	TWeakObjectPtr<UMeshAssetManager> MeshAssetManager;
 	TSharedPtr<SScrollBox> ScrollBox;
+
+	FOnMeshAssetSelected OnMeshAssetSelected;
+	FOnMaterialAssetSelected OnMaterialAssetSelected;
+	FOnTextureAssetSelected OnTextureAssetSelected;
 };
