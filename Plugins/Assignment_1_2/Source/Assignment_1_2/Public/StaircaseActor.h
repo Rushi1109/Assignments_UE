@@ -53,6 +53,7 @@ class ASSIGNMENT_1_2_API AStaircaseActor : public AActor {
     virtual void OnConstruction(const FTransform& Transform) override;
 
     void DestroyStairs();
+    void CreateStairs();
 
     UPROPERTY(EditDefaultsOnly, BluePrintReadWrite, Category = "Properties")
     EStaircaseType StairType;
