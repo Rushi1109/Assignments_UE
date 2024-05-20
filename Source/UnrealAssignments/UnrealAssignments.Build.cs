@@ -8,12 +8,13 @@ public class UnrealAssignments : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "HeadMountedDisplay", "NavigationSystem", "AIModule", "Niagara", "Assignment2" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "HeadMountedDisplay", "NavigationSystem", "AIModule", "Niagara", "Assignment_1_2" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
         PublicIncludePaths.AddRange(new string[] {
-            "C:/Program Files/UE_5.2/Engine/Plugins/EnhancedInput/Source/EnhancedInput/Public/"
+            "C:/Program Files/UE_5.2/Engine/Plugins/EnhancedInput/Source/EnhancedInput/Public/",
+            "D:/Work/Unreal Engine/UnrealAssignments/Plugins/Assignment_1_2/Source/Assignment_1_2/Public"
         });
         // Uncomment if you are using Slate UI
         // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

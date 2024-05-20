@@ -27,7 +27,7 @@ ADynamicPawnController::ADynamicPawnController() : PawnIndex{ 0 }, CurrentSpawne
 
 void ADynamicPawnController::SpawnActor()
 {	
-	DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Game/Assignment2/Assets/BP_PawnDataTable.BP_PawnDataTable'"));
+	DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Assignment_1_2/Assets/BP_PawnDataTable.BP_PawnDataTable'"));
 	if (DataTable) {
 		TArray<FName> RowNames = DataTable->GetRowNames();
 

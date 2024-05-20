@@ -7,11 +7,9 @@
 #include "FirstPersonModeBase.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
-class ASSIGNMENT2_API AFirstPersonModeBase : public AGameModeBase
-{
-	GENERATED_BODY()
-	
+class ASSIGNMENT_1_2_API AFirstPersonModeBase : public AGameModeBase {
+    GENERATED_BODY()
 };

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "../../Assignment2/Public/BaseCharacter.h"
+#include "BaseCharacter.h"
 #include "InputActionValue.h"
 #include "TP_ThirdPersonCharacter.generated.h"
 

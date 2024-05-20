@@ -28,7 +28,7 @@ AFirstPersonPawn::AFirstPersonPawn() : PawnMappingContext{ nullptr }, MoveAction
 
 	FloatingPawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Movement"));
 
-	PawnAttributeAsset = LoadObject<UPawnAttributeAsset>(this, TEXT("/Script/Assignment2.PawnAttributeAsset'/Game/Assignment2/Assets/BP_FirstPersonPawnAttributes.BP_FirstPersonPawnAttributes'"));
+	PawnAttributeAsset = LoadObject<UPawnAttributeAsset>(this, TEXT("/Script/Assignment_1_2.PawnAttributeAsset'/Assignment_1_2/Assets/BP_FIrstPersonPawnAttributes.BP_FIrstPersonPawnAttributes'"));
 }
 
 // Called when the game starts or when spawned
