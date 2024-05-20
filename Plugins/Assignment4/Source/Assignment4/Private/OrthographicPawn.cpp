@@ -1,10 +1,6 @@
 
 
 #include "OrthographicPawn.h"
-#include "InteractiveArchController.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
 
 // Sets default values
 AOrthographicPawn::AOrthographicPawn() : OrthographicPawnMapping{ nullptr }, CameraMovementAction{ nullptr }, ZoomInOutAction{ nullptr },  CameraXRotationAction{ nullptr } {

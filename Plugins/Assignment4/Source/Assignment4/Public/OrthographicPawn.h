@@ -9,7 +9,10 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
-
+#include "InteractiveArchController.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "OrthographicPawn.generated.h"
 
 UCLASS()
