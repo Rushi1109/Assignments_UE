@@ -33,13 +33,13 @@ public:
 	AArchMeshActor* SpawnMeshFromMeshData();
 
 	UFUNCTION(BlueprintCallable)
-	void PopulateMeshData(const FMeshData& Mesh);
+	void HandleMeshSelection(const FMeshData& Mesh);
 
 	UFUNCTION(BlueprintCallable)
-	void PopulateMaterialData(const FMaterialData& Material);
+	void HandleMaterialSelection(const FMaterialData& Material);
 
 	UFUNCTION(BlueprintCallable)
-	void PopulateTextureData(const FTextureData& Texture);
+	void HandleTextureSelection(const FTextureData& Texture);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
 	TSubclassOf<USelectionWidget> SelectionWidget;
@@ -49,15 +49,10 @@ private:
 
 	FVector LastHitLocation;
 	AActor* CurrentHitActor;
+	UMaterialInstanceDynamic* MaterialInstance;
 
 	UPROPERTY()
 	FMeshData MeshData;
-
-	UPROPERTY()
-	FMaterialData MaterialData;
-
-	UPROPERTY()
-	FTextureData TextureData;
 
 	FInputModeGameAndUI InputMode;
 

@@ -12,17 +12,17 @@ void AInteractiveArchController::BeginPlay() {
 
 	Widget = CreateWidget<USelectionWidget>(this, SelectionWidget, TEXT("Selection Widget"));
 	
-	Widget->ScrollBox1->OnMeshAssetReceived.BindUFunction(this, "PopulateMeshData");
-	Widget->ScrollBox1->OnMaterialAssetReceived.BindUFunction(this, "PopulateMaterialData");
-	Widget->ScrollBox1->OnTextureAssetReceived.BindUFunction(this, "PopulateTextureData");
+	Widget->ScrollBox1->OnMeshAssetReceived.BindUFunction(this, "HandleMeshSelection");
+	Widget->ScrollBox1->OnMaterialAssetReceived.BindUFunction(this, "HandleMaterialSelection");
+	Widget->ScrollBox1->OnTextureAssetReceived.BindUFunction(this, "HandleTextureSelection");
 
-	Widget->ScrollBox2->OnMeshAssetReceived.BindUFunction(this, "PopulateMeshData");
-	Widget->ScrollBox2->OnMaterialAssetReceived.BindUFunction(this, "PopulateMaterialData");
-	Widget->ScrollBox2->OnTextureAssetReceived.BindUFunction(this, "PopulateTextureData");
+	Widget->ScrollBox2->OnMeshAssetReceived.BindUFunction(this, "HandleMeshSelection");
+	Widget->ScrollBox2->OnMaterialAssetReceived.BindUFunction(this, "HandleMaterialSelection");
+	Widget->ScrollBox2->OnTextureAssetReceived.BindUFunction(this, "HandleTextureSelection");
 
-	Widget->ScrollBox3->OnMeshAssetReceived.BindUFunction(this, "PopulateMeshData");
-	Widget->ScrollBox3->OnMaterialAssetReceived.BindUFunction(this, "PopulateMaterialData");
-	Widget->ScrollBox3->OnTextureAssetReceived.BindUFunction(this, "PopulateTextureData");
+	Widget->ScrollBox3->OnMeshAssetReceived.BindUFunction(this, "HandleMeshSelection");
+	Widget->ScrollBox3->OnMaterialAssetReceived.BindUFunction(this, "HandleMaterialSelection");
+	Widget->ScrollBox3->OnTextureAssetReceived.BindUFunction(this, "HandleTextureSelection");
 
 	SetInputMode(InputMode);
 }
@@ -154,7 +154,7 @@ AArchMeshActor* AInteractiveArchController::SpawnMeshFromMeshData() {
 	return nullptr;
 }
 
-void AInteractiveArchController::PopulateMeshData(const FMeshData& Mesh) {
+void AInteractiveArchController::HandleMeshSelection(const FMeshData& Mesh) {
 	this->MeshData = Mesh;
 
 	if (bIsArchMeshActor) {
@@ -167,12 +167,17 @@ void AInteractiveArchController::PopulateMeshData(const FMeshData& Mesh) {
 	}
 }
 
-void AInteractiveArchController::PopulateMaterialData(const FMaterialData& Material) {
-	this->MaterialData = Material;
-
+void AInteractiveArchController::HandleMaterialSelection(const FMaterialData& Material) {
 	Cast<AArchMeshActor>(CurrentHitActor)->GetStaticMeshComponent()->SetMaterial(0, Material.MaterialAsset);
 }
 
-void AInteractiveArchController::PopulateTextureData(const FTextureData& Texture) {
-	this->TextureData = Texture;
+void AInteractiveArchController::HandleTextureSelection(const FTextureData& Texture) {
+	UMaterialInstanceDynamic* DynamicMaterial = Cast<UMaterialInstanceDynamic>(Cast<AArchMeshActor>(CurrentHitActor)->GetStaticMeshComponent()->GetMaterial(0));
+
+	if (!DynamicMaterial) {
+		MaterialInstance = UMaterialInstanceDynamic::Create(Cast<AArchMeshActor>(CurrentHitActor)->GetStaticMeshComponent()->GetMaterial(0), this);
+	}
+
+	MaterialInstance->SetTextureParameterValue(TEXT("Texture"), Texture.TextureAsset);
+	Cast<AArchMeshActor>(CurrentHitActor)->GetStaticMeshComponent()->SetMaterial(0, MaterialInstance);
 }
