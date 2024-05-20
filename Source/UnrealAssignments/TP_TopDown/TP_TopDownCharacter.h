@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "NiagaraSystem.h"
-#include "../../Assignment2/Public/BaseCharacter.h"
+#include "BaseCharacter.h"
 #include "GameFramework/Character.h"
 #include "TP_TopDownCharacter.generated.h"
 
