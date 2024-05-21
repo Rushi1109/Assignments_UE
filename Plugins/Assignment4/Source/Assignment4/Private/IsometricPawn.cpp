@@ -96,6 +96,6 @@ void AIsometricPawn::CameraZoom(const FInputActionValue& ActionValue) {
 	float value = ActionValue.Get<float>();
 
 	SpringArm->TargetArmLength -= value * 50;
-	SpringArm->TargetArmLength = FMath::Clamp(SpringArm->TargetArmLength, 1500, 3000);
+	SpringArm->TargetArmLength = FMath::Clamp(SpringArm->TargetArmLength, 1000, 3000);
 }
 

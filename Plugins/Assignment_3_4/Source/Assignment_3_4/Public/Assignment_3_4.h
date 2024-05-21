@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-class FAssignment3Module : public IModuleInterface
+class FAssignment_3_4Module : public IModuleInterface
 {
 public:
 

@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class Assignment3 : ModuleRules
+public class Assignment_3_4 : ModuleRules
 {
-	public Assignment3(ReadOnlyTargetRules Target) : base(Target)
+	public Assignment_3_4(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
@@ -27,8 +27,8 @@ public class Assignment3 : ModuleRules
 			new string[]
 			{
 				"Core",
-				"EnhancedInput",
-				"InputCore",
+                "EnhancedInput",
+                "InputCore",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -41,6 +41,7 @@ public class Assignment3 : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+                "UMG"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
