@@ -2,8 +2,15 @@
 
 
 #include "InteractiveArchController.h"
+#include "OrthographicPawn.h"
+#include "IsometricPawn.h"
+#include "PerspectivePawn.h"
 
-AInteractiveArchController::AInteractiveArchController() : Widget{ nullptr }, CurrentHitActor{ nullptr }, bIsArchMeshActor{false}, LeftClickAction{nullptr}, ToggleVisibilityAction{nullptr}, InputMappingContext{nullptr} {}
+AInteractiveArchController::AInteractiveArchController() : Widget{ nullptr }, LastHitLocation{0, 0, 200}, CurrentHitActor{ nullptr }, bIsArchMeshActor{ false }, LeftClickAction{ nullptr }, ToggleVisibilityAction{ nullptr }, TogglePawnAction{ nullptr },  MeshGeneratorMappingContext{ nullptr }, PawnIndex{ -1 } {
+	PawnReferences.Add(APerspectivePawn::StaticClass());
+	PawnReferences.Add(AOrthographicPawn::StaticClass());
+	PawnReferences.Add(AIsometricPawn::StaticClass());
+}
 
 void AInteractiveArchController::BeginPlay() {
 	Super::BeginPlay();
@@ -25,6 +32,8 @@ void AInteractiveArchController::BeginPlay() {
 	Widget->ScrollBox3->OnTextureAssetReceived.BindUFunction(this, "HandleTextureSelection");
 
 	SetInputMode(InputMode);
+
+	HandleTogglePawn();
 }
 
 void AInteractiveArchController::SetupInputComponent() {
@@ -33,22 +42,31 @@ void AInteractiveArchController::SetupInputComponent() {
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
 	check(EnhancedInputComponent);
 
-	LeftClickAction = NewObject<UInputAction>(this, TEXT("LeftClickAction"));
+	LeftClickAction = NewObject<UInputAction>(this);
 	LeftClickAction->ValueType = EInputActionValueType::Boolean;
-	ToggleVisibilityAction = NewObject<UInputAction>(this, TEXT("ToggleVisibilityAction"));
+	ToggleVisibilityAction = NewObject<UInputAction>(this);
 	ToggleVisibilityAction->ValueType = EInputActionValueType::Boolean;
 
-	InputMappingContext = NewObject<UInputMappingContext>(this, TEXT("InputMappingContext"));
-	InputMappingContext->MapKey(LeftClickAction, EKeys::LeftMouseButton);
-	InputMappingContext->MapKey(ToggleVisibilityAction, EKeys::Tab);
+	MeshGeneratorMappingContext = NewObject<UInputMappingContext>(this);
+	MeshGeneratorMappingContext->MapKey(LeftClickAction, EKeys::LeftMouseButton);
+	MeshGeneratorMappingContext->MapKey(ToggleVisibilityAction, EKeys::Tab);
+
+	// Context for TogglePawn
+	TogglePawnAction = NewObject<UInputAction>(this);
+	TogglePawnAction->ValueType = EInputActionValueType::Boolean;
+
+	SwitchMappingContext = NewObject<UInputMappingContext>(this);
+	SwitchMappingContext->MapKey(TogglePawnAction, EKeys::P);
 
 	EnhancedInputComponent->BindAction(LeftClickAction, ETriggerEvent::Completed, this, &AInteractiveArchController::HandleLeftClick);
 	EnhancedInputComponent->BindAction(ToggleVisibilityAction, ETriggerEvent::Completed, this, &AInteractiveArchController::HandleTabKey);
+	EnhancedInputComponent->BindAction(TogglePawnAction, ETriggerEvent::Completed, this, &AInteractiveArchController::HandleTogglePawn);
 
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	check(Subsystem);
-
-	Subsystem->AddMappingContext(InputMappingContext, 0);
+	if (Subsystem) {
+		Subsystem->AddMappingContext(MeshGeneratorMappingContext, 0);
+		Subsystem->AddMappingContext(SwitchMappingContext, 0);
+	}
 }
 
 void AInteractiveArchController::HandleLeftClick() {
@@ -88,6 +106,7 @@ void AInteractiveArchController::HandleLeftClick() {
 				LastHitLocation = HitResult.Location;
 				if (CurrentHitActor->IsA(AArchMeshActor::StaticClass())) {
 					bIsArchMeshActor = true;
+					GetPawn()->SetActorLocation(LastHitLocation + FVector{ 0, 0, 100 });
 
 					Widget->SetVisibility(ESlateVisibility::Visible);
 					Widget->ScrollBox1->SetVisibility(ESlateVisibility::Visible);
@@ -128,6 +147,36 @@ void AInteractiveArchController::HandleTabKey() {
 	}
 }
 
+void AInteractiveArchController::HandleTogglePawn() {
+	PawnIndex = (PawnIndex + 1) % PawnReferences.Num();
+
+	if (GetPawn()) {
+		GetPawn()->Destroy();
+	}
+
+	UEnhancedInputLocalPlayerSubsystem* SubSystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+	if (SubSystem) {
+		SubSystem->ClearAllMappings();
+	}
+
+	FActorSpawnParameters SpawnActorParams;
+	SpawnActorParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	FRotator Rotator = FRotator::ZeroRotator;
+
+	APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(PawnReferences[PawnIndex], LastHitLocation + FVector{0,0, 50}, Rotator, SpawnActorParams);
+
+	if (SpawnedPawn) {
+		Possess(SpawnedPawn);
+	}
+
+	SubSystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+	if (SubSystem) {
+		SubSystem->AddMappingContext(SwitchMappingContext, 0);
+		SubSystem->AddMappingContext(MeshGeneratorMappingContext, 0);
+	}
+}
+
 AArchMeshActor* AInteractiveArchController::SpawnMeshFromMeshData() {
 	if (this->MeshData.MeshAsset) {
 		FActorSpawnParameters SpawnParameters;
@@ -164,6 +213,14 @@ void AInteractiveArchController::HandleMeshSelection(const FMeshData& Mesh) {
 	}
 	else{
 		SpawnMeshFromMeshData();
+	}
+	
+	if (GetPawn()->IsA(APerspectivePawn::StaticClass())) {
+		APerspectivePawn* PerspectivePawn = Cast<APerspectivePawn>(GetPawn());
+		PerspectivePawn->SetActorLocation(LastHitLocation + FVector{ 0, 0, 100 });
+	}
+	else {
+		GetPawn()->SetActorLocation(LastHitLocation + FVector{ 0, 0, 100 });
 	}
 }
 

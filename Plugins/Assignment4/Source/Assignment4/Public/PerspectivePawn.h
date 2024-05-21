@@ -5,12 +5,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 
 #include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "EnhancedInputSubsystems.h"
+
 
 #include "PerspectivePawn.generated.h"
 
@@ -34,7 +36,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	UPROPERTY(EditDefaultsOnly)
+	USpringArmComponent* SpringArm;
+
+	UPROPERTY(EditDefaultsOnly)
 	UCameraComponent* Camera;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")

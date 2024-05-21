@@ -19,6 +19,7 @@ AIsometricPawn::AIsometricPawn() : IsometricPawnMapping{ nullptr }, CameraLeftRo
 	SpringArm->bEnableCameraRotationLag = true;
 	SpringArm->CameraLagSpeed = 5.0f;
 	SpringArm->CameraRotationLagSpeed = 30.0f;
+	SpringArm->bDoCollisionTest = false;
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("IsometricCamera"));
 	Camera->SetupAttachment(SpringArm, SpringArm->SocketName);
@@ -50,7 +51,7 @@ void AIsometricPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	AInteractiveArchController* PlayerController = Cast<AInteractiveArchController>(GetController());
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 
 	IsometricPawnMapping = NewObject<UInputMappingContext>(this);
 

@@ -11,6 +11,9 @@
 #include "InputMappingContext.h"
 #include "DataAsset/MeshAssetManager.h"
 #include "EnhancedInputSubsystems.h"
+#include "IsometricPawn.h"
+#include "PerspectivePawn.h"
+#include "OrthographicPawn.h"
 #include "InteractiveArchController.generated.h"
 
 /**
@@ -26,8 +29,14 @@ public:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 
+	UFUNCTION()
 	void HandleLeftClick();
+
+	UFUNCTION()
 	void HandleTabKey();
+
+	UFUNCTION()
+	void HandleTogglePawn();
 
 	UFUNCTION(BlueprintCallable)
 	AArchMeshActor* SpawnMeshFromMeshData();
@@ -60,5 +69,13 @@ private:
 
 	UInputAction* LeftClickAction;
 	UInputAction* ToggleVisibilityAction;
-	UInputMappingContext* InputMappingContext;
+	UInputAction* TogglePawnAction;
+
+	UInputMappingContext* MeshGeneratorMappingContext;
+
+	UInputMappingContext* SwitchMappingContext;
+
+	TArray<TSubclassOf<APawn>> PawnReferences;
+
+	int PawnIndex;
 };

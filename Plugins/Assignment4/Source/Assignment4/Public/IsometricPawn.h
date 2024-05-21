@@ -10,7 +10,7 @@
 #include "InputAction.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
-#include "InteractiveArchController.h"
+#include "EnhancedInputSubsystems.h"
 #include "IsometricPawn.generated.h"
 
 UCLASS()
