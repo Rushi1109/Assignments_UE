@@ -178,8 +178,7 @@ void SMeshSelectionScrollBox::LoadTextureData() {
 			SizeBox->SetWidthOverride(TAttribute<FOptionalSize>{125.f});
 			SizeBox->SetHeightOverride(TAttribute<FOptionalSize>{125.f});
 
-			FSlateColorBrush* Brush = new FSlateColorBrush(FLinearColor{ 0.208745, 0.788352, 1.0 });
-			TSharedPtr<SBorder> BorderBox = SNew(SBorder).BorderImage(Brush);
+			TSharedPtr<SBorder> BorderBox = SNew(SBorder);
 
 			if (UTexture2D* TextureIcon = Cast<UTexture2D>(TextureData.TextureAsset)) {
 				FSlateBrush* ThumbnailBrush = new FSlateBrush();
