@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ProceduralMeshComponent.h"
+#include "Components/SceneComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "VerticalRailActor.generated.h"
 
 UCLASS()
@@ -25,36 +27,18 @@ public:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	UFUNCTION(BlueprintCallable)
-	int AddNewVertex(const FVector& VertexCordinates);
+	void DrawTriangleFromVertex(TArray<int32>& Triangles, int32 Vertex1, int32 Vertex2, int32 Vertex3);
 
-	UFUNCTION(BlueprintCallable)
-	int AddUV(const FVector2D& UVCordinates);
-
-	UFUNCTION(BlueprintCallable)
-	void DrawTriangleFromVertex(int32 Vertex1, int32 Vertex2, int32 Vertex3);
-
-	UFUNCTION(BlueprintCallable)
-	void GenerateCube(const FVector& Dimensions);
+	void GenerateCube(int32 SectionIndex, const FVector& Dimensions);
+	void GenerateSphere(int32 SectionIndex, float Radius, int32 RingsCount, int32 PointsCount, float ZOffset);
 
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "ProceduralMesh")
+	USceneComponent* SceneRoot;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "ProceduralMesh")
 	UProceduralMeshComponent* ProceduralMeshComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Procedural Mesh")
-	TArray<FVector> Vertices;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Procedural Mesh")
-	TArray<int32> Triangles;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Procedural Mesh")
-	TArray<FVector2D> UVs;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Procedural Mesh")
-	TArray<FVector> Normals;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Procedural Mesh")
-	TArray<FLinearColor> LinearColors;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Procedural Mesh")
-	TArray<FProcMeshTangent> Tangents;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ProceduralMesh")
+	FVector CubeDimensions;
 };

@@ -4,14 +4,18 @@
 #include "VerticalRailActor.h"
 
 // Sets default values
-AVerticalRailActor::AVerticalRailActor() {
+AVerticalRailActor::AVerticalRailActor() : CubeDimensions{ 10.0, 10.0, 120.0 } {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	ProceduralMeshComponent = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("ProceduralMeshComponent"));
-	SetRootComponent(ProceduralMeshComponent);
+	SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
+	SetRootComponent(SceneRoot);
 
-	GenerateCube(FVector{ 100 });
+	ProceduralMeshComponent = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("ProceduralMeshComponent"));
+	ProceduralMeshComponent->SetupAttachment(SceneRoot);
+
+	GenerateCube(0, CubeDimensions);
+	GenerateSphere(1, CubeDimensions.X / 2, 10, 25, CubeDimensions.Z / 2);
 }
 
 // Called when the game starts or when spawned
@@ -29,91 +33,87 @@ void AVerticalRailActor::Tick(float DeltaTime) {
 void AVerticalRailActor::OnConstruction(const FTransform& Transform) {
 	Super::OnConstruction(Transform);
 
-	ProceduralMeshComponent->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UVs, LinearColors, Tangents, true);
 }
 
-int AVerticalRailActor::AddNewVertex(const FVector& VertexCordinates) {
-	return Vertices.Add(VertexCordinates);
-}
-
-int AVerticalRailActor::AddUV(const FVector2D& UVCordinates) {
-	return UVs.Add(UVCordinates);
-}
-
-void AVerticalRailActor::DrawTriangleFromVertex(int32 Vertex0, int32 Vertex1, int32 Vertex2) {
+void AVerticalRailActor::DrawTriangleFromVertex(TArray<int32>& Triangles, int32 Vertex0, int32 Vertex1, int32 Vertex2) {
 	Triangles.Add(Vertex0);
 	Triangles.Add(Vertex1);
 	Triangles.Add(Vertex2);
 }
 
-void AVerticalRailActor::GenerateCube(const FVector& Dimensions) {
-	ProceduralMeshComponent->ClearAllMeshSections();
+void AVerticalRailActor::GenerateCube(int32 SectionIndex, const FVector& Dimensions) {
+	ProceduralMeshComponent->ClearMeshSection(SectionIndex);
+
+	TArray<FVector> Vertices;
+	TArray<int32> Triangles;
+	TArray<FVector2D> UVs;
+	TArray<FVector> Normals;
 
 	// Bottom Face
-	AddNewVertex(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 0 - - -
-	AddNewVertex(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 1 - + -
-	AddNewVertex(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 2 + - -
-	AddNewVertex(FVector{ Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 3 + + -
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 0 - - -
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 1 - + -
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 2 + - -
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 3 + + -
 
 	// Top Face
-	AddNewVertex(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 4 - - +
-	AddNewVertex(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 5 - + +
-	AddNewVertex(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 6 + - +
-	AddNewVertex(FVector{ Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 7 + + +
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 4 - - +
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 5 - + +
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 6 + - +
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 7 + + +
 
 	// Front Face
-	AddNewVertex(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 8 - - - 0
-	AddNewVertex(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 9 - + - 1
-	AddNewVertex(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 10 - - + 4
-	AddNewVertex(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 11 - + + 5
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 8 - - - 0
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 9 - + - 1
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 10 - - + 4
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 11 - + + 5
 
 	// Back Face
-	AddNewVertex(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 12 + - - 2
-	AddNewVertex(FVector{ Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 13 + + - 3
-	AddNewVertex(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 14 + - + 6
-	AddNewVertex(FVector{ Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 15 + + + 7
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 12 + - - 2
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 13 + + - 3
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 14 + - + 6
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 15 + + + 7
 
 	// Left Face
-	AddNewVertex(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 16 + - - 2
-	AddNewVertex(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 17 - - - 0
-	AddNewVertex(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 18 + - + 6
-	AddNewVertex(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 19 - - + 4
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 16 + - - 2
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 17 - - - 0
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 18 + - + 6
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 19 - - + 4
 
 	// Right Face
-	AddNewVertex(FVector{ Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 20 + + - 3
-	AddNewVertex(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 21 - + - 1
-	AddNewVertex(FVector{ Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 22 + + + 7
-	AddNewVertex(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 23 - + + 5
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 20 + + - 3
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 21 - + - 1
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 22 + + + 7
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 23 - + + 5
 
 	// Bottom Face Triangle
-	DrawTriangleFromVertex(2, 3, 0);
-	DrawTriangleFromVertex(3, 1, 0);
+	DrawTriangleFromVertex(Triangles, 2, 3, 0);
+	DrawTriangleFromVertex(Triangles, 3, 1, 0);
 
 	// Top Face Triangle
-	DrawTriangleFromVertex(4, 5, 6);
-	DrawTriangleFromVertex(5, 7, 6);
+	DrawTriangleFromVertex(Triangles, 4, 5, 6);
+	DrawTriangleFromVertex(Triangles, 5, 7, 6);
 
 	// Front Face Triangle
-	DrawTriangleFromVertex(8, 9, 10);
-	DrawTriangleFromVertex(9, 11, 10);
+	DrawTriangleFromVertex(Triangles, 8, 9, 10);
+	DrawTriangleFromVertex(Triangles, 9, 11, 10);
 
 	// Back Face Triangle
-	DrawTriangleFromVertex(13, 12, 15);
-	DrawTriangleFromVertex(12, 14, 15);
+	DrawTriangleFromVertex(Triangles, 13, 12, 15);
+	DrawTriangleFromVertex(Triangles, 12, 14, 15);
 
 	// Left Face Triangle
-	DrawTriangleFromVertex(16, 17, 18);
-	DrawTriangleFromVertex(17, 19, 18);
+	DrawTriangleFromVertex(Triangles, 16, 17, 18);
+	DrawTriangleFromVertex(Triangles, 17, 19, 18);
 
 	// Right Face Triangle
-	DrawTriangleFromVertex(21, 20, 23);
-	DrawTriangleFromVertex(20, 22, 23);
+	DrawTriangleFromVertex(Triangles, 21, 20, 23);
+	DrawTriangleFromVertex(Triangles, 20, 22, 23);
 
 	for (int32 i = 0; i < Vertices.Num(); i += 4) {
-		AddUV(FVector2D{ 0.0, 1.0 });
-		AddUV(FVector2D{ 1.0, 1.0 });
-		AddUV(FVector2D{ 0.0, 0.0 });
-		AddUV(FVector2D{ 1.0, 0.0 });
+		UVs.Add(FVector2D{ 0.0, 1.0 });
+		UVs.Add(FVector2D{ 1.0, 1.0 });
+		UVs.Add(FVector2D{ 0.0, 0.0 });
+		UVs.Add(FVector2D{ 1.0, 0.0 });
 	}
 
 	for (int32 i = 0; i < Vertices.Num(); ++i) {
@@ -137,5 +137,55 @@ void AVerticalRailActor::GenerateCube(const FVector& Dimensions) {
 		}
 	}
 
-	ProceduralMeshComponent->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UVs, LinearColors, Tangents, true);
+	ProceduralMeshComponent->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UVs, TArray<FLinearColor>{}, TArray<FProcMeshTangent>{}, true);
+}
+
+void AVerticalRailActor::GenerateSphere(int32 SectionIndex, float Radius, int32 RingsCount, int32 PointsCount, float ZOffset) {
+	ProceduralMeshComponent->ClearMeshSection(SectionIndex);
+
+	TArray<FVector> Vertices;
+	TArray<int32> Triangles;
+	TArray<FVector2D> UVs;
+	TArray<FVector> Normals;
+
+	for (int32 RingIndex = 0; RingIndex < RingsCount; ++RingIndex) {
+		float Theta = PI * RingIndex;
+		if (PointsCount > 1) {
+			Theta /= (RingsCount - 1);
+		}
+
+		float SinTheta = FMath::Sin(Theta);
+		float CosTheta = FMath::Cos(Theta);
+
+		float V = Theta / PI;
+
+		for (int32 PointIndex = 0; PointIndex < PointsCount; ++PointIndex) {
+			float Phi = 2 * PI * PointIndex;
+			if (PointsCount > 1) {
+				Phi /= (PointsCount - 1);
+			}
+
+			float SinPhi = FMath::Sin(Phi);
+			float CosPhi = FMath::Cos(Phi);
+
+			float U = Phi / (2 * PI);
+
+			FVector Vertex = FVector{ SinTheta * SinPhi, SinTheta * CosPhi, CosTheta } *Radius;
+			Vertex.Z += ZOffset;
+
+			Vertices.Add(Vertex);
+			UVs.Add(FVector2D{ U, V });
+			Normals.Add(UKismetMathLibrary::GetDirectionUnitVector(FVector{0, 0, ZOffset}, Vertex));
+
+			if (RingIndex < RingsCount - 1 && PointIndex < PointsCount - 1) {
+				int32 CurrentRingVertexIndex = RingIndex * PointsCount + PointIndex;
+				int32 NextRingVertexIndex = (RingIndex + 1) * PointsCount + PointIndex;
+
+				DrawTriangleFromVertex(Triangles, CurrentRingVertexIndex, NextRingVertexIndex, NextRingVertexIndex + 1);
+				DrawTriangleFromVertex(Triangles, NextRingVertexIndex + 1, CurrentRingVertexIndex + 1, CurrentRingVertexIndex);
+			}
+		}
+	}
+
+	ProceduralMeshComponent->CreateMeshSection_LinearColor(SectionIndex, Vertices, Triangles, Normals, UVs, TArray<FLinearColor>{}, TArray<FProcMeshTangent>{}, true);
 }
