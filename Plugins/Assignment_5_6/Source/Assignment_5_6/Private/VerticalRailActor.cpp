@@ -4,7 +4,7 @@
 #include "VerticalRailActor.h"
 
 // Sets default values
-AVerticalRailActor::AVerticalRailActor() : CubeDimensions{ 10.0, 10.0, 120.0 } {
+AVerticalRailActor::AVerticalRailActor() : CubeDimensions{ 10.0, 10.0, 100.0 } {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -13,9 +13,6 @@ AVerticalRailActor::AVerticalRailActor() : CubeDimensions{ 10.0, 10.0, 120.0 } {
 
 	ProceduralMeshComponent = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("ProceduralMeshComponent"));
 	ProceduralMeshComponent->SetupAttachment(SceneRoot);
-
-	GenerateCube(0, CubeDimensions);
-	GenerateSphere(1, CubeDimensions.X / 2, 10, 25, CubeDimensions.Z / 2);
 }
 
 // Called when the game starts or when spawned
@@ -30,9 +27,13 @@ void AVerticalRailActor::Tick(float DeltaTime) {
 
 }
 
-void AVerticalRailActor::OnConstruction(const FTransform& Transform) {
-	Super::OnConstruction(Transform);
+void AVerticalRailActor::GenerateVerticalRailActor(const FVector& RailingDimensions) {
+	CubeDimensions = RailingDimensions;
 
+	ProceduralMeshComponent->ClearAllMeshSections();
+
+	GenerateCube(0, CubeDimensions);
+	GenerateRailingTop(RailingDimensions);
 }
 
 void AVerticalRailActor::DrawTriangleFromVertex(TArray<int32>& Triangles, int32 Vertex0, int32 Vertex1, int32 Vertex2) {
@@ -41,8 +42,30 @@ void AVerticalRailActor::DrawTriangleFromVertex(TArray<int32>& Triangles, int32 
 	Triangles.Add(Vertex2);
 }
 
+void AVerticalRailActor::GenerateRailingTop(const FVector& RailDimensions) {
+	switch (RailTopType) {
+	case ERailTopType::WindsorTurnedCapital:
+		break;
+	case ERailTopType::RoundTurnedCapital:
+		GenerateBellShape(1, RailDimensions.X / 2, RailDimensions.X / 4, RailDimensions.X / 4, 1.0f, 10, 25, (RailDimensions.Z / 2) + (RailDimensions.X / 4));
+		GenerateSphere(2, RailDimensions.X / 2, 10, 25, (RailDimensions.Z / 2) + (3 * RailDimensions.X / 4));
+		break;
+	case ERailTopType::AcornCapital:
+		break;
+	case ERailTopType::GothicStarTop:
+		break;
+	case ERailTopType::RoundedOverTop:
+		break;
+	case ERailTopType::RoundedStarTop:
+		break;
+	case ERailTopType::PyramidTop:
+		break;
+	default:
+		break;
+	}
+}
+
 void AVerticalRailActor::GenerateCube(int32 SectionIndex, const FVector& Dimensions) {
-	ProceduralMeshComponent->ClearMeshSection(SectionIndex);
 
 	TArray<FVector> Vertices;
 	TArray<int32> Triangles;
@@ -137,11 +160,10 @@ void AVerticalRailActor::GenerateCube(int32 SectionIndex, const FVector& Dimensi
 		}
 	}
 
-	ProceduralMeshComponent->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UVs, TArray<FLinearColor>{}, TArray<FProcMeshTangent>{}, true);
+	ProceduralMeshComponent->CreateMeshSection_LinearColor(SectionIndex, Vertices, Triangles, Normals, UVs, TArray<FLinearColor>{}, TArray<FProcMeshTangent>{}, true);
 }
 
 void AVerticalRailActor::GenerateSphere(int32 SectionIndex, float Radius, int32 RingsCount, int32 PointsCount, float ZOffset) {
-	ProceduralMeshComponent->ClearMeshSection(SectionIndex);
 
 	TArray<FVector> Vertices;
 	TArray<int32> Triangles;
@@ -157,8 +179,6 @@ void AVerticalRailActor::GenerateSphere(int32 SectionIndex, float Radius, int32 
 		float SinTheta = FMath::Sin(Theta);
 		float CosTheta = FMath::Cos(Theta);
 
-		float V = Theta / PI;
-
 		for (int32 PointIndex = 0; PointIndex < PointsCount; ++PointIndex) {
 			float Phi = 2 * PI * PointIndex;
 			if (PointsCount > 1) {
@@ -168,13 +188,15 @@ void AVerticalRailActor::GenerateSphere(int32 SectionIndex, float Radius, int32 
 			float SinPhi = FMath::Sin(Phi);
 			float CosPhi = FMath::Cos(Phi);
 
-			float U = Phi / (2 * PI);
-
 			FVector Vertex = FVector{ SinTheta * SinPhi, SinTheta * CosPhi, CosTheta } *Radius;
 			Vertex.Z += ZOffset;
-
+			
 			Vertices.Add(Vertex);
-			UVs.Add(FVector2D{ U, V });
+
+			float UChannel = Phi / (2 * PI);
+			float VChannel = Theta / PI;
+			UVs.Add(FVector2D{ UChannel, VChannel });
+
 			Normals.Add(UKismetMathLibrary::GetDirectionUnitVector(FVector{0, 0, ZOffset}, Vertex));
 
 			if (RingIndex < RingsCount - 1 && PointIndex < PointsCount - 1) {
@@ -184,6 +206,81 @@ void AVerticalRailActor::GenerateSphere(int32 SectionIndex, float Radius, int32 
 				DrawTriangleFromVertex(Triangles, CurrentRingVertexIndex, NextRingVertexIndex, NextRingVertexIndex + 1);
 				DrawTriangleFromVertex(Triangles, NextRingVertexIndex + 1, CurrentRingVertexIndex + 1, CurrentRingVertexIndex);
 			}
+		}
+	}
+
+	ProceduralMeshComponent->CreateMeshSection_LinearColor(SectionIndex, Vertices, Triangles, Normals, UVs, TArray<FLinearColor>{}, TArray<FProcMeshTangent>{}, true);
+}
+
+void AVerticalRailActor::GenerateBellShape(int32 SectionIndex, float BaseRadius, float Height, float RimRadius, float CurvatureFactor, int32 RingsCount, int32 PointsCount, float ZOffset) {
+
+	//Declarations
+	TArray<FVector> Vertices;
+	TArray<int32> Triangles;
+	TArray<FVector> Normals;
+	TArray<FVector2D> UVs;
+
+	//Vertices
+	for (int32 RingIndex = 0; RingIndex < RingsCount; ++RingIndex) {
+		float Theta = RingIndex * PI;
+		if (RingsCount > 1) {
+			Theta /= (RingsCount - 1);
+		}
+
+		// Bell profile function for radius interpolation with curvature
+		float t = (Theta * 2.0f) / PI;
+		float CurrentRadius = FMath::Lerp(BaseRadius, RimRadius, FMath::Sin(t * CurvatureFactor));
+
+		for (int32 PointIndex = 0; PointIndex < PointsCount; ++PointIndex) {
+			float Phi = (PointIndex * 2.0f * PI);
+			if (PointsCount > 1) {
+				Phi /= (PointsCount - 1);
+			}
+
+			float SinPhi = FMath::Sin(Phi);
+			float CosPhi = FMath::Cos(Phi);
+
+			FVector Vertex = FVector{ CurrentRadius * SinPhi,  CurrentRadius * CosPhi, Height * (t - 1.0f) };
+			Vertex.Z += ZOffset;
+
+			Vertices.Add(Vertex);
+
+			float UChannel = Phi / (2 * PI);
+			float VChannel = Theta / PI;
+			UVs.Add(FVector2D{ UChannel, VChannel });
+		}
+	}
+
+	//Triangles
+	for (int32 RingIndex = 0; RingIndex < RingsCount - 1; ++RingIndex) {
+		for (int32 PointIndex = 0; PointIndex < PointsCount - 1; ++PointIndex) {
+			int32 BottomLeft = RingIndex * PointsCount + PointIndex;
+			int32 BottomRight = BottomLeft + 1;
+			int32 TopLeft = BottomLeft + PointsCount;
+			int32 TopRight = TopLeft + 1;
+
+			// First triangle
+			DrawTriangleFromVertex(Triangles, TopLeft, BottomLeft, BottomRight);
+			DrawTriangleFromVertex(Triangles, TopLeft, BottomRight, BottomLeft);
+
+			// Second triangle
+			DrawTriangleFromVertex(Triangles, BottomRight, TopRight, TopLeft);
+			DrawTriangleFromVertex(Triangles, BottomRight, TopLeft, TopRight);
+		}
+	}
+
+	for (int32 RingIndex = 0; RingIndex < RingsCount - 1; ++RingIndex) {
+		for (int32 PointIndex = 0; PointIndex < PointsCount - 1; ++PointIndex) {
+			int32 BottomLeft = RingIndex * PointsCount + PointIndex;
+			int32 BottomRight = BottomLeft + 1;
+			int32 TopLeft = BottomLeft + PointsCount;
+			int32 TopRight = TopLeft + 1;
+
+			auto Normal1 = FVector::CrossProduct((Vertices[BottomRight] - Vertices[BottomLeft]), (Vertices[TopLeft] - Vertices[BottomLeft])).GetSafeNormal();
+			auto Normal2 = FVector::CrossProduct((Vertices[TopLeft] - Vertices[TopRight]), (Vertices[BottomRight] - Vertices[TopRight])).GetSafeNormal();
+
+			Normals.Add(Normal1);
+			Normals.Add(Normal2);
 		}
 	}
 

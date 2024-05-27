@@ -5,7 +5,26 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/SplineComponent.h"
+#include "VerticalRailActor.h"
 #include "FenceMeshActor.generated.h"
+
+USTRUCT(Blueprintable)
+struct FFenceProperties {
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fence")
+	float Length;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fence")
+	float Width;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fence")
+	float Height;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fence")
+	float Spacing;
+};
+
 
 UCLASS()
 class ASSIGNMENT_5_6_API AFenceMeshActor : public AActor {
@@ -23,6 +42,33 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Defaults")
+	USceneComponent* SceneRoot;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 	USplineComponent* SplineComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vertical Rail")
+	TSubclassOf<AVerticalRailActor> VerticalRailActorClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Vertical Rail")
+	UStaticMesh* RailingStaticMesh;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+	TArray<UStaticMeshComponent*> RailingStaticMeshes;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+	TArray<AVerticalRailActor*> VerticalRailActors;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fence")
+	FFenceProperties FenceProperties;
+
+	UFUNCTION(BlueprintCallable)
+	void GenerateStaticFence();
+
+	UFUNCTION(BlueprintCallable)
+	void DestroyStaticFence();
+
+	UFUNCTION(BlueprintCallable)
+	void GenerateProceduralFence();
 };

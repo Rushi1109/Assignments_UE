@@ -9,6 +9,18 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "VerticalRailActor.generated.h"
 
+
+UENUM()
+enum class ERailTopType : int8 {
+	WindsorTurnedCapital,
+	RoundTurnedCapital,
+	AcornCapital,
+	GothicStarTop,
+	RoundedOverTop,
+	RoundedStarTop,
+	PyramidTop
+};
+
 UCLASS()
 class ASSIGNMENT_5_6_API AVerticalRailActor : public AActor {
 	GENERATED_BODY()
@@ -24,13 +36,18 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void OnConstruction(const FTransform& Transform) override;
+	
+	UFUNCTION(BlueprintCallable)
+	void GenerateVerticalRailActor(const FVector& RailingDimensions);
 
 	UFUNCTION(BlueprintCallable)
 	void DrawTriangleFromVertex(TArray<int32>& Triangles, int32 Vertex1, int32 Vertex2, int32 Vertex3);
 
+	void GenerateRailingTop(const FVector& CubeDimensions);
+
 	void GenerateCube(int32 SectionIndex, const FVector& Dimensions);
 	void GenerateSphere(int32 SectionIndex, float Radius, int32 RingsCount, int32 PointsCount, float ZOffset);
+	void GenerateBellShape(int32 SectionIndex, float BaseRadius, float Height, float RimRadius, float CurvatureFactor, int32 RingsCount, int32 PointsCount, float ZOffset);
 
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "ProceduralMesh")
@@ -41,4 +58,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ProceduralMesh")
 	FVector CubeDimensions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rail Top Type")
+	ERailTopType RailTopType;
 };
