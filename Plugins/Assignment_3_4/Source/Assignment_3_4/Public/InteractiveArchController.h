@@ -78,10 +78,13 @@ public:
     void PrintMessageOnViewPort(const FString& Message);
 
 private:
+	UPROPERTY()
 	USelectionWidget* MeshGeneratorSelectionWidget;
 
 	FVector LastHitLocation;
+	UPROPERTY()
 	AActor* CurrentHitActor;
+	UPROPERTY()
 	UMaterialInstanceDynamic* MaterialInstance;
 
 	UPROPERTY()
@@ -91,25 +94,31 @@ private:
 
 	bool bIsArchMeshActor;
 
+	UPROPERTY()
 	UInputAction* LeftClickAction;
+	UPROPERTY()
 	UInputAction* ToggleVisibilityAction;
-
+	UPROPERTY()
 	UInputMappingContext* MeshGeneratorMappingContext;
 
 	void SetupMeshGeneratorInput();
 
+	UPROPERTY()
 	UInputAction* TogglePawnAction;
 
+	UPROPERTY()
 	UInputMappingContext* SwitchMappingContext;
 
 	void SetupSwitchInput();
 
+	UPROPERTY()
 	TArray<TSubclassOf<APawn>> PawnReferences;
 
+	UPROPERTY()
 	int PawnIndex;
 
 	// Wall
-
+	UPROPERTY()
 	UInputMappingContext* WallGeneratorMappingContext;
 
 	void SetupWallGeneratorInput();
@@ -146,6 +155,7 @@ private:
 	//Toggle Mode
 	bool bToggleInputContext;
 
+	UPROPERTY()
 	UInputMappingContext* CurrentMappingContext;
 
 public:

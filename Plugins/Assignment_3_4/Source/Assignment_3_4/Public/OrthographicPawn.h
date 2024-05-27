@@ -51,8 +51,6 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite)
 	UInputAction* CameraXRotationAction;
  
-
- 
 private:
 	UFUNCTION(BlueprintCallable, Meta = (AllowPrivateAccess=true))
 	void CameraMovement(const FInputActionValue& ActionValue);

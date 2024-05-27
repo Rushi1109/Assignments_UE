@@ -42,12 +42,19 @@ class ASSIGNMENT_3_4_API AWallBuilderController : public APlayerController {
     UFUNCTION(BlueprintCallable)
     void DestroyAllSplineWall();
 
+    UPROPERTY()
     UInputAction* LeftClickAction;
+    UPROPERTY()
     UInputAction* RightClickAction;
+    UPROPERTY()
     UInputAction* SelectPreviousWallAction;
+    UPROPERTY()
     UInputAction* SelectNextWallAction;
+    UPROPERTY()
     UInputAction* DestroySplineWallAction;
+    UPROPERTY()
     UInputAction* DeleteLastSplineWallAction;
+    UPROPERTY()
     UInputMappingContext* MappingContext;
 
     FNotificationDelegate Notification;
