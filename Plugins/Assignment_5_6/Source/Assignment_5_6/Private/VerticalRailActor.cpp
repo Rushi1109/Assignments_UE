@@ -32,7 +32,7 @@ void AVerticalRailActor::GenerateVerticalRailActor(const FVector& RailingDimensi
 
 	ProceduralMeshComponent->ClearAllMeshSections();
 
-	GenerateCube(0, CubeDimensions);
+	GenerateCube(0, CubeDimensions, 0);
 	GenerateRailingTop(RailingDimensions);
 }
 
@@ -45,12 +45,19 @@ void AVerticalRailActor::DrawTriangleFromVertex(TArray<int32>& Triangles, int32 
 void AVerticalRailActor::GenerateRailingTop(const FVector& RailDimensions) {
 	switch (RailTopType) {
 	case ERailTopType::WindsorTurnedCapital:
+		GenerateCube(1, FVector{ RailDimensions.X, RailDimensions.Y, RailDimensions.X / 4 }, (RailDimensions.Z / 2) + (RailDimensions.X / 8));
+		GenerateBellShape(2, RailDimensions.X / 2, RailDimensions.X / 4, RailDimensions.X / 4, 1.0f, 50, 15, (RailDimensions.Z / 2) + (RailDimensions.X / 2));
+		GenerateSphere(3, RailDimensions.X / 2, 15, 75, (RailDimensions.Z / 2) + (RailDimensions.X));
 		break;
 	case ERailTopType::RoundTurnedCapital:
-		GenerateBellShape(1, RailDimensions.X / 2, RailDimensions.X / 4, RailDimensions.X / 4, 1.0f, 10, 25, (RailDimensions.Z / 2) + (RailDimensions.X / 4));
-		GenerateSphere(2, RailDimensions.X / 2, 10, 25, (RailDimensions.Z / 2) + (3 * RailDimensions.X / 4));
+		GenerateCube(1, FVector{ RailDimensions.X, RailDimensions.Y, RailDimensions.X / 4 }, (RailDimensions.Z / 2) + (RailDimensions.X / 8));
+		GenerateBellShape(2, RailDimensions.X / 2, RailDimensions.X / 4, RailDimensions.X / 4, 1.0f, 10, 25, (RailDimensions.Z / 2) + (RailDimensions.X / 2));
+		GenerateSphere(3, RailDimensions.X / 2, 10, 25, (RailDimensions.Z / 2) + (RailDimensions.X));
 		break;
 	case ERailTopType::AcornCapital:
+		GenerateCube(1, FVector{ RailDimensions.X, RailDimensions.Y, RailDimensions.X / 4 }, (RailDimensions.Z / 2) + (RailDimensions.X / 8));
+		GenerateBellShape(2, RailDimensions.X / 2, RailDimensions.X / 4, RailDimensions.X / 4, 1.0f, 10, 25, (RailDimensions.Z / 2) + (RailDimensions.X / 2));
+		GenerateSphere(3, RailDimensions.X / 2, 10, 25, (RailDimensions.Z / 2) + (RailDimensions.X), 1.5);
 		break;
 	case ERailTopType::GothicStarTop:
 		break;
@@ -65,7 +72,7 @@ void AVerticalRailActor::GenerateRailingTop(const FVector& RailDimensions) {
 	}
 }
 
-void AVerticalRailActor::GenerateCube(int32 SectionIndex, const FVector& Dimensions) {
+void AVerticalRailActor::GenerateCube(int32 SectionIndex, const FVector& Dimensions, float ZOffset) {
 
 	TArray<FVector> Vertices;
 	TArray<int32> Triangles;
@@ -73,40 +80,40 @@ void AVerticalRailActor::GenerateCube(int32 SectionIndex, const FVector& Dimensi
 	TArray<FVector> Normals;
 
 	// Front Face
-	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 0 - - +
-	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 1 - - -
-	Vertices.Add(FVector{ -Dimensions.X / 2, +Dimensions.Y / 2, -Dimensions.Z / 2 }); // 2 - + -
-	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 3 - + +
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, ZOffset + Dimensions.Z / 2 }); // 0 - - +
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, ZOffset - Dimensions.Z / 2 }); // 1 - - -
+	Vertices.Add(FVector{ -Dimensions.X / 2, +Dimensions.Y / 2, ZOffset - Dimensions.Z / 2 }); // 2 - + -
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, ZOffset + Dimensions.Z / 2 }); // 3 - + +
 
 	// Right Face
-	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 4 - + + 3
-	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 5 - + - 2
-	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 6 + + -
-	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 7 + + +
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, ZOffset + Dimensions.Z / 2 }); // 4 - + + 3
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, ZOffset - Dimensions.Z / 2 }); // 5 - + - 2
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, ZOffset - Dimensions.Z / 2 }); // 6 + + -
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, ZOffset + Dimensions.Z / 2 }); // 7 + + +
 
 	// Back Face
-	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 8 + + + 7
-	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 9 + + - 6
-	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 10 + - - 
-	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 11 + - + 
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, ZOffset + Dimensions.Z / 2 }); // 8 + + + 7
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, ZOffset - Dimensions.Z / 2 }); // 9 + + - 6
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, ZOffset - Dimensions.Z / 2 }); // 10 + - - 
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, ZOffset + Dimensions.Z / 2 }); // 11 + - + 
 
 	// Left Face
-	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 12 + - + 11
-	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 13 + - - 10
-	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 14 - - - 1
-	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 15 - - + 0
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, ZOffset + Dimensions.Z / 2 }); // 12 + - + 11
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, ZOffset - Dimensions.Z / 2 }); // 13 + - - 10
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, ZOffset - Dimensions.Z / 2 }); // 14 - - - 1
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, ZOffset + Dimensions.Z / 2 }); // 15 - - + 0
 
 	// Top Face
-	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 16 + - + 11
-	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 17 - - + 0
-	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 18 - + + 3
-	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 19 + + + 7
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, ZOffset + Dimensions.Z / 2 }); // 16 + - + 11
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, ZOffset + Dimensions.Z / 2 }); // 17 - - + 0
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, ZOffset + Dimensions.Z / 2 }); // 18 - + + 3
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, ZOffset + Dimensions.Z / 2 }); // 19 + + + 7
 
 	// Right Face
-	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 20 - - - 1
-	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 21 + - - 10
-	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 22 + + - 6
-	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 23 - + - 2
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, ZOffset - Dimensions.Z / 2 }); // 20 - - - 1
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, ZOffset - Dimensions.Z / 2 }); // 21 + - - 10
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, ZOffset - Dimensions.Z / 2 }); // 22 + + - 6
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, ZOffset - Dimensions.Z / 2 }); // 23 - + - 2
 
 	// Triangles
 	for (int32 i = 0; i < 24; i += 4) {
@@ -135,7 +142,7 @@ void AVerticalRailActor::GenerateCube(int32 SectionIndex, const FVector& Dimensi
 	ProceduralMeshComponent->CreateMeshSection_LinearColor(SectionIndex, Vertices, Triangles, Normals, UVs, TArray<FLinearColor>{}, TArray<FProcMeshTangent>{}, true);
 }
 
-void AVerticalRailActor::GenerateSphere(int32 SectionIndex, float Radius, int32 RingsCount, int32 PointsCount, float ZOffset) {
+void AVerticalRailActor::GenerateSphere(int32 SectionIndex, float Radius, int32 RingsCount, int32 PointsCount, float ZOffset, float CurveFactor) {
 
 	TArray<FVector> Vertices;
 	TArray<int32> Triangles;
@@ -160,7 +167,7 @@ void AVerticalRailActor::GenerateSphere(int32 SectionIndex, float Radius, int32 
 			float SinPhi = FMath::Sin(Phi);
 			float CosPhi = FMath::Cos(Phi);
 
-			FVector Vertex = FVector{ SinTheta * SinPhi, SinTheta * CosPhi, CosTheta } *Radius;
+			FVector Vertex = FVector{ SinTheta * SinPhi, SinTheta * CosPhi, CosTheta * CurveFactor } *Radius;
 			Vertex.Z += ZOffset;
 			
 			Vertices.Add(Vertex);

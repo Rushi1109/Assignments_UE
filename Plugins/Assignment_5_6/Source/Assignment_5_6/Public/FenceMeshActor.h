@@ -41,6 +41,7 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void OnConstruction(const FTransform& Transform) override;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Defaults")
 	USceneComponent* SceneRoot;
@@ -57,10 +58,7 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 	TArray<UStaticMeshComponent*> RailingStaticMeshes;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-	TArray<AVerticalRailActor*> VerticalRailActors;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fence")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fence Properties")
 	FFenceProperties FenceProperties;
 
 	UFUNCTION(BlueprintCallable)
@@ -71,4 +69,19 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void GenerateProceduralFence();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fence")
+	UStaticMesh* HorizontalStaticMesh;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Fence")
+	TArray<UStaticMeshComponent*> HorizontalStaticMeshes;
+
+	UFUNCTION(BlueprintCallable)
+	void GenerateStaticHorizontalMesh();
+
+	UFUNCTION(BlueprintCallable)
+	void DestroyStaticHorizontalMesh();
+
+	UFUNCTION(BlueprintCallable)
+	void GenerateProceduralHorizontalMesh();
 };
