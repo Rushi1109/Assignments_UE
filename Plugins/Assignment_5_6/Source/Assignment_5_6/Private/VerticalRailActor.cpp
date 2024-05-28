@@ -72,92 +72,64 @@ void AVerticalRailActor::GenerateCube(int32 SectionIndex, const FVector& Dimensi
 	TArray<FVector2D> UVs;
 	TArray<FVector> Normals;
 
-	// Bottom Face
-	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 0 - - -
-	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 1 - + -
-	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 2 + - -
-	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 3 + + -
-
-	// Top Face
-	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 4 - - +
-	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 5 - + +
-	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 6 + - +
-	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 7 + + +
-
 	// Front Face
-	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 8 - - - 0
-	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 9 - + - 1
-	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 10 - - + 4
-	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 11 - + + 5
-
-	// Back Face
-	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 12 + - - 2
-	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 13 + + - 3
-	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 14 + - + 6
-	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 15 + + + 7
-
-	// Left Face
-	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 16 + - - 2
-	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 17 - - - 0
-	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 18 + - + 6
-	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 19 - - + 4
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 0 - - +
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 1 - - -
+	Vertices.Add(FVector{ -Dimensions.X / 2, +Dimensions.Y / 2, -Dimensions.Z / 2 }); // 2 - + -
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 3 - + +
 
 	// Right Face
-	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 20 + + - 3
-	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 21 - + - 1
-	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 22 + + + 7
-	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 23 - + + 5
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 4 - + + 3
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 5 - + - 2
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 6 + + -
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 7 + + +
 
-	// Bottom Face Triangle
-	DrawTriangleFromVertex(Triangles, 2, 3, 0);
-	DrawTriangleFromVertex(Triangles, 3, 1, 0);
+	// Back Face
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 8 + + + 7
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 9 + + - 6
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 10 + - - 
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 11 + - + 
 
-	// Top Face Triangle
-	DrawTriangleFromVertex(Triangles, 4, 5, 6);
-	DrawTriangleFromVertex(Triangles, 5, 7, 6);
+	// Left Face
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 12 + - + 11
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 13 + - - 10
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 14 - - - 1
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 15 - - + 0
 
-	// Front Face Triangle
-	DrawTriangleFromVertex(Triangles, 8, 9, 10);
-	DrawTriangleFromVertex(Triangles, 9, 11, 10);
+	// Top Face
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 16 + - + 11
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, Dimensions.Z / 2 }); // 17 - - + 0
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 18 - + + 3
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, Dimensions.Z / 2 }); // 19 + + + 7
 
-	// Back Face Triangle
-	DrawTriangleFromVertex(Triangles, 13, 12, 15);
-	DrawTriangleFromVertex(Triangles, 12, 14, 15);
+	// Right Face
+	Vertices.Add(FVector{ -Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 20 - - - 1
+	Vertices.Add(FVector{ Dimensions.X / 2, -Dimensions.Y / 2, -Dimensions.Z / 2 }); // 21 + - - 10
+	Vertices.Add(FVector{ Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 22 + + - 6
+	Vertices.Add(FVector{ -Dimensions.X / 2, Dimensions.Y / 2, -Dimensions.Z / 2 }); // 23 - + - 2
 
-	// Left Face Triangle
-	DrawTriangleFromVertex(Triangles, 16, 17, 18);
-	DrawTriangleFromVertex(Triangles, 17, 19, 18);
+	// Triangles
+	for (int32 i = 0; i < 24; i += 4) {
+		DrawTriangleFromVertex(Triangles, i, i + 1, i + 2);
+		DrawTriangleFromVertex(Triangles, i + 2, i + 3, i);
+	}
 
-	// Right Face Triangle
-	DrawTriangleFromVertex(Triangles, 21, 20, 23);
-	DrawTriangleFromVertex(Triangles, 20, 22, 23);
-
+	// UVs
 	for (int32 i = 0; i < Vertices.Num(); i += 4) {
+		UVs.Add(FVector2D{ 0.0, 0.0 });
 		UVs.Add(FVector2D{ 0.0, 1.0 });
 		UVs.Add(FVector2D{ 1.0, 1.0 });
-		UVs.Add(FVector2D{ 0.0, 0.0 });
 		UVs.Add(FVector2D{ 1.0, 0.0 });
 	}
 
-	for (int32 i = 0; i < Vertices.Num(); ++i) {
-		if (i >= 0 && i <= 3) {
-			Normals.Add(FVector{ 0.0, 0.0, -1.0 });
-		}
-		else if (i >= 4 && i <= 7) {
-			Normals.Add(FVector{ 0.0, 0.0, 1.0 });
-		}
-		else if (i >= 8 && i <= 11) {
-			Normals.Add(FVector{ -1.0, 0.0, 0.0 });
-		}
-		else if (i >= 12 && i <= 15) {
-			Normals.Add(FVector{ 1.0, 0.0, 0.0 });
-		}
-		else if (i >= 16 && i <= 19) {
-			Normals.Add(FVector{ 0.0, -1.0, 0.0 });
-		}
-		else if (i >= 20 && i <= 23) {
-			Normals.Add(FVector{ 0.0, 1.0, 0.0 });
-		}
+	// Normals
+	for (int32 i = 0; i < 24; i += 4) {
+		FVector CurrentNormal = FVector::CrossProduct(UKismetMathLibrary::GetDirectionUnitVector(Vertices[i + 2], Vertices[i + 1]), UKismetMathLibrary::GetDirectionUnitVector(Vertices[i + 1], Vertices[i]));
+
+		Normals.Add(CurrentNormal);
+		Normals.Add(CurrentNormal);
+		Normals.Add(CurrentNormal);
+		Normals.Add(CurrentNormal);
 	}
 
 	ProceduralMeshComponent->CreateMeshSection_LinearColor(SectionIndex, Vertices, Triangles, Normals, UVs, TArray<FLinearColor>{}, TArray<FProcMeshTangent>{}, true);
@@ -276,8 +248,8 @@ void AVerticalRailActor::GenerateBellShape(int32 SectionIndex, float BaseRadius,
 			int32 TopLeft = BottomLeft + PointsCount;
 			int32 TopRight = TopLeft + 1;
 
-			auto Normal1 = FVector::CrossProduct((Vertices[BottomRight] - Vertices[BottomLeft]), (Vertices[TopLeft] - Vertices[BottomLeft])).GetSafeNormal();
-			auto Normal2 = FVector::CrossProduct((Vertices[TopLeft] - Vertices[TopRight]), (Vertices[BottomRight] - Vertices[TopRight])).GetSafeNormal();
+			auto Normal1 = FVector::CrossProduct(UKismetMathLibrary::GetDirectionUnitVector(Vertices[BottomLeft], Vertices[BottomRight]), UKismetMathLibrary::GetDirectionUnitVector(Vertices[BottomLeft], Vertices[TopLeft])).GetSafeNormal();
+			auto Normal2 = FVector::CrossProduct(UKismetMathLibrary::GetDirectionUnitVector(Vertices[TopRight], Vertices[TopLeft]), UKismetMathLibrary::GetDirectionUnitVector(Vertices[TopRight], Vertices[BottomRight])).GetSafeNormal();
 
 			Normals.Add(Normal1);
 			Normals.Add(Normal2);
