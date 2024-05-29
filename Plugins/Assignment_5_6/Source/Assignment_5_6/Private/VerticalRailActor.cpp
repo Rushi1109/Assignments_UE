@@ -48,6 +48,7 @@ void AVerticalRailActor::GenerateRailingTop(const FVector& RailDimensions) {
 		GenerateCube(1, FVector{ RailDimensions.X, RailDimensions.Y, RailDimensions.X / 4 }, (RailDimensions.Z / 2) + (RailDimensions.X / 8));
 		GenerateBellShape(2, RailDimensions.X / 2, RailDimensions.X / 4, RailDimensions.X / 4, 1.0f, 50, 15, (RailDimensions.Z / 2) + (RailDimensions.X / 2));
 		GenerateSphere(3, RailDimensions.X / 2, 15, 75, (RailDimensions.Z / 2) + (RailDimensions.X));
+		GenerateCone(4, RailDimensions.X / 8, RailDimensions.X / 5, 5, 10, (RailDimensions.Z / 2) + (RailDimensions.X) + (RailDimensions.X / 2));
 		break;
 	case ERailTopType::RoundTurnedCapital:
 		GenerateCube(1, FVector{ RailDimensions.X, RailDimensions.Y, RailDimensions.X / 4 }, (RailDimensions.Z / 2) + (RailDimensions.X / 8));
@@ -336,6 +337,230 @@ void AVerticalRailActor::GeneratePyramid(int32 SectionIndex, const FVector& Dime
 		Normals.Add(CurrentNormal);
 		Normals.Add(CurrentNormal);
 		Normals.Add(CurrentNormal);
+	}
+
+	ProceduralMeshComponent->CreateMeshSection_LinearColor(SectionIndex, Vertices, Triangles, Normals, UVs, TArray<FLinearColor>{}, TArray<FProcMeshTangent>{}, true);
+}
+
+void AVerticalRailActor::GenerateCone(int32 SectionIndex, float Radius, float Length, int32 RingCount, int32 PointsCount, float ZOffset) {
+
+	TArray<FVector> Vertices;
+	TArray<int32> Triangles;
+	TArray<FVector> Normals;
+	TArray<FVector2D> UVs;
+
+	// Surface
+	for (int32 RingIndex = 0; RingIndex < RingCount; ++RingIndex) {
+		for (int32 PointIndex = 0; PointIndex < PointsCount; ++PointIndex) {
+
+			float Phi = 2 * PI * PointIndex;
+			if (PointsCount > 1) {
+				Phi /= (PointsCount - 1);
+			}
+			float SinPhi = FMath::Sin(Phi);
+			float CosPhi = FMath::Cos(Phi);
+
+			float DynamicRadius = Radius * ((float)RingIndex / (RingCount - 1));
+
+			FVector Vertex = FVector{ DynamicRadius * SinPhi,  DynamicRadius * CosPhi, Length * (1 - ((float)RingIndex / (RingCount - 1))) };
+			Vertex.Z += ZOffset;
+
+			Vertices.Add(Vertex);
+			UVs.Add(FVector2D{ Phi / (2 * PI),  (1.0 - ((float)RingIndex / (RingCount - 1))) });
+
+			if (RingIndex < RingCount - 1 && PointIndex < PointsCount - 1) {
+				int32 CurrentVertexIndex = RingIndex * PointsCount + PointIndex;
+				int32 NextVertexIndex = CurrentVertexIndex + PointsCount;
+
+				DrawTriangleFromVertex(Triangles, CurrentVertexIndex, NextVertexIndex, NextVertexIndex + 1);
+				DrawTriangleFromVertex(Triangles, NextVertexIndex + 1, CurrentVertexIndex + 1, CurrentVertexIndex);
+			}
+		}
+	}
+
+	//Normals
+	for (int32 RingIndex = 0; RingIndex < RingCount - 1; ++RingIndex) {
+		for (int32 PointIndex = 0; PointIndex < PointsCount - 1; ++PointIndex) {
+			int32 CurrentVertexIndex = RingIndex * PointsCount + PointIndex;
+			int32 NextVertexIndex = CurrentVertexIndex + PointsCount;
+
+			FVector Normal = FVector::CrossProduct(UKismetMathLibrary::GetDirectionUnitVector(Vertices[NextVertexIndex], Vertices[CurrentVertexIndex]), UKismetMathLibrary::GetDirectionUnitVector(Vertices[NextVertexIndex], Vertices[NextVertexIndex + 1])).GetSafeNormal();
+			Normals.Add(Normal);
+
+			if (PointIndex == PointsCount - 2) {
+				Normals.Add(Normal);
+			}
+		}
+	}
+
+	// Normals for last ring of cone
+	for (int32 PointIndex = 0; PointIndex < PointsCount - 1; ++PointIndex) {
+		int32 CurrentVertexIndex = (RingCount - 2) * PointsCount + PointIndex;
+		int32 NextVertexIndex = CurrentVertexIndex + PointsCount;
+
+		FVector Normal = FVector::CrossProduct(UKismetMathLibrary::GetDirectionUnitVector(Vertices[NextVertexIndex], Vertices[CurrentVertexIndex]), UKismetMathLibrary::GetDirectionUnitVector(Vertices[NextVertexIndex], Vertices[NextVertexIndex + 1])).GetSafeNormal();
+		Normals.Add(Normal);
+
+		if (PointIndex == PointsCount - 2) {
+			Normals.Add(Normal);
+		}
+	}
+
+	//Base Circle
+	Vertices.Add(FVector(0.0f, 0.0f, ZOffset));
+	UVs.Add(FVector2D(0.5f, 0.5f));
+
+	for (int32 PointIndex = 0; PointIndex < PointsCount; ++PointIndex) {
+		float Phi = 2 * PI * PointIndex;
+		if (PointsCount > 1) {
+			Phi /= (PointsCount - 1);
+		}
+		float X = Radius * FMath::Sin(Phi);
+		float Y = Radius * FMath::Cos(Phi);
+		float Z = ZOffset;
+
+		Vertices.Add(FVector(X, Y, Z));
+		UVs.Add(FVector2D(Y / Radius / 2.0f + 0.5f, X / Radius / 2.0f + 0.5f));
+	}
+
+	FVector Normal = FVector::CrossProduct(Vertices[RingCount * PointsCount + 1], Vertices[RingCount * PointsCount + 2]).GetSafeNormal();
+	Normals.Add(Normal);
+
+	//Triangles and Normals
+	for (int32 i = 1; i <= PointsCount; ++i) {
+		if (i < PointsCount) {
+			DrawTriangleFromVertex(Triangles, RingCount * PointsCount + i, RingCount * PointsCount, (RingCount * PointsCount + i + 1));
+		}
+		else {
+			DrawTriangleFromVertex(Triangles, RingCount * PointsCount + i, RingCount * PointsCount, (RingCount * PointsCount + 1));
+		}
+		Normals.Add(Normal);
+	}
+
+	ProceduralMeshComponent->CreateMeshSection_LinearColor(SectionIndex, Vertices, Triangles, Normals, UVs, TArray<FLinearColor>{}, TArray<FProcMeshTangent>{}, true);
+}
+
+void AVerticalRailActor::GenerateCylinder(int32 SectionIndex, float Radius, float Length, int32 RingCount, int32 PointsCount, float ZOffset) {
+
+	TArray<FVector> Vertices;
+	TArray<int32> Triangles;
+	TArray<FVector> Normals;
+	TArray<FVector2D> UVs;
+
+	//Populating
+	for (int32 RingIndex = 0; RingIndex < RingCount; ++RingIndex) {
+		for (int32 PointIndex = 0; PointIndex < PointsCount; ++PointIndex) {
+
+			float Phi = 2 * PI * PointIndex;
+			if (PointsCount > 1) {
+				Phi /= (PointsCount - 1);
+			}
+			float SinPhi = FMath::Sin(Phi);
+			float CosPhi = FMath::Cos(Phi);
+
+			FVector Vertex = FVector{ Radius * SinPhi,  Radius * CosPhi, Length * (1 - ((float)RingIndex / (RingCount - 1))) };
+			Vertex.Z += ZOffset;
+
+			Vertices.Add(Vertex);
+			UVs.Add(FVector2D{ Phi / (2 * PI),  (1 - ((float)RingIndex / (RingCount - 1))) });
+
+			if (RingIndex < RingCount - 1 && PointIndex < PointsCount - 1) {
+				int32 CurrentVertexIndex = RingIndex * PointsCount + PointIndex;
+				int32 NextVertexIndex = CurrentVertexIndex + PointsCount;
+
+				DrawTriangleFromVertex(Triangles, CurrentVertexIndex, NextVertexIndex, NextVertexIndex + 1);
+				DrawTriangleFromVertex(Triangles, NextVertexIndex + 1, CurrentVertexIndex + 1, CurrentVertexIndex);
+			}
+		}
+	}
+
+	//Normals
+	for (int32 RingIndex = 0; RingIndex < RingCount - 1; ++RingIndex) {
+		for (int32 PointIndex = 0; PointIndex < PointsCount - 1; ++PointIndex) {
+			int32 CurrentVertexIndex = RingIndex * PointsCount + PointIndex;
+			int32 NextVertexIndex = CurrentVertexIndex + PointsCount;
+
+			FVector Normal = FVector::CrossProduct(UKismetMathLibrary::GetDirectionUnitVector(Vertices[NextVertexIndex], Vertices[CurrentVertexIndex]), UKismetMathLibrary::GetDirectionUnitVector(Vertices[NextVertexIndex], Vertices[NextVertexIndex + 1])).GetSafeNormal();
+			Normals.Add(Normal);
+
+			if (PointIndex == PointsCount - 2) {
+				Normals.Add(Normal);
+			}
+		}
+	}
+
+	for (int32 PointIndex = 0; PointIndex < PointsCount - 1; ++PointIndex) {
+		int32 CurrentVertexIndex = (RingCount - 2) * PointsCount + PointIndex;
+		int32 NextVertexIndex = CurrentVertexIndex + PointsCount;
+
+		FVector Normal = FVector::CrossProduct(UKismetMathLibrary::GetDirectionUnitVector(Vertices[NextVertexIndex], Vertices[CurrentVertexIndex]), UKismetMathLibrary::GetDirectionUnitVector(Vertices[NextVertexIndex], Vertices[NextVertexIndex + 1])).GetSafeNormal();
+		Normals.Add(Normal);
+
+		if (PointIndex == PointsCount - 2) {
+			Normals.Add(Normal);
+		}
+	}
+
+	//Base Circle
+	Vertices.Add(FVector(0.0f, 0.0f, ZOffset));
+	UVs.Add(FVector2D(0.5f, 0.5f));
+
+	for (int32 PointIndex = 0; PointIndex < PointsCount; ++PointIndex) {
+		float Phi = 2 * PI * PointIndex;
+		if (PointsCount > 1) {
+			Phi /= (PointsCount - 1);
+		}
+		float X = Radius * FMath::Sin(Phi);
+		float Y = Radius * FMath::Cos(Phi);
+		float Z = ZOffset;
+
+		Vertices.Add(FVector(X, Y, Z));
+		UVs.Add(FVector2D(Y / Radius / 2.0f + 0.5f, X / Radius / 2.0f + 0.5f));
+	}
+
+	FVector Normal = FVector::CrossProduct(Vertices[RingCount * PointsCount + 1], Vertices[RingCount * PointsCount + 2]).GetSafeNormal();
+	Normals.Add(Normal);
+
+	//Triangles and Normals
+	for (int32 i = 1; i <= PointsCount; ++i) {
+		if (i < PointsCount) {
+			DrawTriangleFromVertex(Triangles, RingCount * PointsCount + i, RingCount * PointsCount, (RingCount * PointsCount + i + 1));
+		}
+		else {
+			DrawTriangleFromVertex(Triangles, RingCount * PointsCount + i, RingCount * PointsCount, (RingCount * PointsCount + 1));
+		}
+		Normals.Add(Normal);
+	}
+
+	//Top Circle
+	Vertices.Add(FVector(0.0f, 0.0f, ZOffset + Length));
+	UVs.Add(FVector2D(0.5f, 0.5f));
+
+	for (int32 PointIndex = 0; PointIndex < PointsCount; ++PointIndex) {
+		float Phi = 2 * PI * PointIndex;
+		if (PointsCount > 1) {
+			Phi /= (PointsCount - 1);
+		}
+		float X = Radius * FMath::Sin(Phi);
+		float Y = Radius * FMath::Cos(Phi);
+		float Z = ZOffset + Length;
+
+		Vertices.Add(FVector(X, Y, Z));
+		UVs.Add(FVector2D(Y / Radius / 2.0f + 0.5f, X / Radius / 2.0f + 0.5f));
+	}
+
+	Normal = FVector::CrossProduct(Vertices[(RingCount + 1) * PointsCount + 3], Vertices[(RingCount + 1) * PointsCount + 2]).GetSafeNormal();
+	Normals.Add(Normal);
+
+	//Triangles and Normals
+	for (int32 i = 1; i <= PointsCount; ++i) {
+		if (i < PointsCount) {
+			DrawTriangleFromVertex(Triangles, (RingCount + 1) * PointsCount + 1, (RingCount + 1)* PointsCount + (i + 1), ((RingCount + 1) * PointsCount + i + 2));
+		}
+		else {
+			DrawTriangleFromVertex(Triangles, (RingCount + 1) * PointsCount + 1, (RingCount + 1)* PointsCount + (i + 1), ((RingCount + 1) * PointsCount + 2));
+		}
+		Normals.Add(Normal);
 	}
 
 	ProceduralMeshComponent->CreateMeshSection_LinearColor(SectionIndex, Vertices, Triangles, Normals, UVs, TArray<FLinearColor>{}, TArray<FProcMeshTangent>{}, true);

@@ -45,10 +45,23 @@ public:
 
 	void GenerateRailingTop(const FVector& CubeDimensions);
 
+	UFUNCTION(BlueprintCallable)
 	void GenerateCube(int32 SectionIndex, const FVector& Dimensions, float ZOffset = 0.f);
+
+	UFUNCTION(BlueprintCallable)
 	void GenerateSphere(int32 SectionIndex, float Radius, int32 RingsCount, int32 PointsCount, float ZOffset = 0.f, float CurveFactor = 1.f);
+
+	UFUNCTION(BlueprintCallable)
 	void GenerateBellShape(int32 SectionIndex, float BaseRadius, float Height, float RimRadius, float CurvatureFactor, int32 RingsCount, int32 PointsCount, float ZOffset = 0.f);
+
+	UFUNCTION(BlueprintCallable)
 	void GeneratePyramid(int32 SectionIndex, const FVector& Dimensions, float ZOffset);
+
+	UFUNCTION(BlueprintCallable)
+	void GenerateCone(int32 SectionIndex, float Radius, float Length, int32 RingCount, int32 PointsCount, float ZOffset);
+
+	UFUNCTION(BlueprintCallable)
+	void GenerateCylinder(int32 SectionIndex, float Radius, float Length, int32 RingCount, int32 PointsCount, float ZOffset);
 
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "ProceduralMesh")
