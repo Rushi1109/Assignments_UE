@@ -48,6 +48,7 @@ public:
 	void GenerateCube(int32 SectionIndex, const FVector& Dimensions, float ZOffset = 0.f);
 	void GenerateSphere(int32 SectionIndex, float Radius, int32 RingsCount, int32 PointsCount, float ZOffset = 0.f, float CurveFactor = 1.f);
 	void GenerateBellShape(int32 SectionIndex, float BaseRadius, float Height, float RimRadius, float CurvatureFactor, int32 RingsCount, int32 PointsCount, float ZOffset = 0.f);
+	void GeneratePyramid(int32 SectionIndex, const FVector& Dimensions, float ZOffset);
 
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "ProceduralMesh")
