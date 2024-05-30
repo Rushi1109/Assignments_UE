@@ -15,6 +15,7 @@ enum class ERailTopType : int8 {
 	WindsorTurnedCapital,
 	RoundTurnedCapital,
 	AcornCapital,
+	GothicTop,
 	GothicStarTop,
 	RoundedOverTop,
 	RoundedStarTop,
@@ -38,7 +39,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	UFUNCTION(BlueprintCallable)
-	void GenerateVerticalRailActor(const FVector& RailingDimensions);
+	void GenerateVerticalRailActor(const FVector& RailDimensions);
 
 	UFUNCTION(BlueprintCallable)
 	void DrawTriangleFromVertex(TArray<int32>& Triangles, int32 Vertex1, int32 Vertex2, int32 Vertex3);
@@ -63,6 +64,23 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void GenerateCylinder(int32 SectionIndex, float Radius, float Length, int32 RingCount, int32 PointsCount, float ZOffset);
 
+	UFUNCTION(BlueprintCallable)
+	void GeneratePrism(int32 SectionIndex, const FVector& Dimensions, float ZOffset);
+
+	UFUNCTION(BlueprintCallable)
+	void GenerateSideTriangleLeft(int32 SectionIndex, const FVector& Dimensions, float ZOffset);
+
+	UFUNCTION(BlueprintCallable)
+	void GenerateSideTriangleRight(int32 SectionIndex, const FVector& Dimensions, float ZOffset);
+
+	UFUNCTION(BlueprintCallable)
+	void GenerateHorizontalHalfCylinder(int32 SectionIndex, float Radius, float Length, int32 RingCount, int32 PointsCount, FVector Offset);
+
+	UFUNCTION(BlueprintCallable)
+	void GenerateRoundedStar(int32 SectionIndex, const FVector& StarDimensions, int32 PointsCount, FVector Offset);
+
+	UFUNCTION(BlueprintCallable)
+	void GenerateDonut(int32 SectionIndex, float OuterRadius, float InnerRadius, int NumSegments, int NumSides, float ZOffset);
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "ProceduralMesh")
 	USceneComponent* SceneRoot;
