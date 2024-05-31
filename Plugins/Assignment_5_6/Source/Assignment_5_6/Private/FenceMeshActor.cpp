@@ -101,8 +101,21 @@ void AFenceMeshActor::GenerateProceduralFence() {
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		AVerticalRailActor* SpawnedVerticalRailActor = GetWorld()->SpawnActor<AVerticalRailActor>(VerticalRailActorClass, StartLocation, StartRotation, SpawnParams);
-		SpawnedVerticalRailActor->GenerateVerticalRailActor(FVector{ FenceProperties.Length, FenceProperties.Width, FenceProperties.Height });
+		AVerticalRailActor* SpawnedVerticalRailActor;
+		if (VerticalRailActorClass) {
+			SpawnedVerticalRailActor = GetWorld()->SpawnActor<AVerticalRailActor>(VerticalRailActorClass, StartLocation, StartRotation, SpawnParams);
+		}
+		else {
+			SpawnedVerticalRailActor = GetWorld()->SpawnActor<AVerticalRailActor>(AVerticalRailActor::StaticClass(), StartLocation, StartRotation, SpawnParams);
+		}
+
+		if (SpawnedVerticalRailActor) {
+			SpawnedVerticalRailActor->GenerateVerticalRailActor(FVector{ FenceProperties.Length, FenceProperties.Width, FenceProperties.Height });
+
+			if (SpawnedVerticalRailActor->RailTopType == ERailTopType::GothicTop || SpawnedVerticalRailActor->RailTopType == ERailTopType::GothicStarTop) {
+				AddActorLocalRotation(FRotator{ 0.0, 90.0, 0.0 });
+			}
+		}
 
 		DistanceCovered += TotalSpacing;
 	}

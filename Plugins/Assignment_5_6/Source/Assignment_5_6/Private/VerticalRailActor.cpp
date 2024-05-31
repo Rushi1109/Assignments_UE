@@ -62,20 +62,16 @@ void AVerticalRailActor::GenerateRailingTop(const FVector& RailDimensions) {
 		GenerateDonut(4, RailDimensions.X / 2, 1, 10, 50, (RailDimensions.Z / 2) + (RailDimensions.X));
 		break;
 	case ERailTopType::GothicTop:
-		GenerateCube(1, FVector{ 7 * RailDimensions.X / 10, 7 * RailDimensions.Y / 10, RailDimensions.X / 10 }, (RailDimensions.Z / 2) + (RailDimensions.X / 20));
+		GenerateCube(1, FVector{ 2 * RailDimensions.X / 3, 2 * RailDimensions.Y / 3, RailDimensions.X / 10 }, (RailDimensions.Z / 2) + (RailDimensions.X / 20));
 		GenerateCube(2, FVector{ RailDimensions.X, RailDimensions.Y, 2 * RailDimensions.X / 3 }, (RailDimensions.Z / 2) + (RailDimensions.X / 10) + (RailDimensions.X / 3));
 		GeneratePrism(3, FVector{ RailDimensions.X, RailDimensions.Y, RailDimensions.X }, (RailDimensions.Z / 2) + (RailDimensions.X / 10) + (7 * RailDimensions.X / 6));
-
-		AddActorLocalRotation(FRotator{ 0.0, 90.0, 0.0 });
 		break;
 	case ERailTopType::GothicStarTop:
-		GenerateCube(1, FVector{ 7 * RailDimensions.X / 10, 7 * RailDimensions.Y / 10, RailDimensions.X / 10 }, (RailDimensions.Z / 2) + (RailDimensions.X / 20));
+		GenerateCube(1, FVector{ 2 * RailDimensions.X / 3, 2 * RailDimensions.Y / 3, RailDimensions.X / 10 }, (RailDimensions.Z / 2) + (RailDimensions.X / 20));
 		GenerateCube(2, FVector{ RailDimensions.X, RailDimensions.Y, 2 * RailDimensions.X / 3 }, (RailDimensions.Z / 2) + (RailDimensions.X / 10) + (RailDimensions.X / 3));
 		GeneratePrism(3, FVector{ RailDimensions.X, RailDimensions.Y, RailDimensions.X }, (RailDimensions.Z / 2) + (RailDimensions.X / 10) + (7 * RailDimensions.X / 6));
 		GenerateSideTriangleLeft(4, FVector{ RailDimensions.X, RailDimensions.Y, RailDimensions.X }, (RailDimensions.Z / 2) + (RailDimensions.X / 10) + (7 * RailDimensions.X / 6));
 		GenerateSideTriangleRight(5, FVector{ RailDimensions.X, RailDimensions.Y, RailDimensions.X }, (RailDimensions.Z / 2) + (RailDimensions.X / 10) + (7 * RailDimensions.X / 6));
-
-		AddActorLocalRotation(FRotator{ 0.0, 90.0, 0.0 });
 		break;
 	case ERailTopType::RoundedOverTop:
 		GenerateCube(1, FVector{ (2 * RailDimensions.X) / 3, (2 * RailDimensions.Y) / 3, RailDimensions.X / 10 }, (RailDimensions.Z / 2) + (RailDimensions.X / 20));
@@ -720,9 +716,9 @@ void AVerticalRailActor::GenerateSideTriangleLeft(int32 SectionIndex, const FVec
 
 	UVs.Add(FVector2D{ 0.0, 0.0 });
 	UVs.Add(FVector2D{ 0.5, 1.0 });
+	UVs.Add(FVector2D{ 0.0, 1.0 });
 	UVs.Add(FVector2D{ 1.0, 0.0 });
-	UVs.Add(FVector2D{ 0.0, 0.0 });
-	UVs.Add(FVector2D{ 1.0, 0.0 });
+	UVs.Add(FVector2D{ 1.0, 1.0 });
 	UVs.Add(FVector2D{ 0.5, 1.0 });
 
 	// Normals
@@ -794,12 +790,12 @@ void AVerticalRailActor::GenerateSideTriangleRight(int32 SectionIndex, const FVe
 	}
 
 	// 2 Triangles
-	UVs.Add(FVector2D{ 0.0, 0.0 });
 	UVs.Add(FVector2D{ 1.0, 0.0 });
+	UVs.Add(FVector2D{ 1.0, 1.0 });
 	UVs.Add(FVector2D{ 0.5, 1.0 });
 	UVs.Add(FVector2D{ 0.0, 0.0 });
 	UVs.Add(FVector2D{ 0.5, 1.0 });
-	UVs.Add(FVector2D{ 1.0, 0.0 });
+	UVs.Add(FVector2D{ 0.0, 1.0 });
 
 	// Normals
 	for (int i = 0; i < 8; i += 4) {
@@ -1157,14 +1153,10 @@ void AVerticalRailActor::GenerateDonut(int32 SectionIndex, float OuterRadius, fl
 			int32 BottomRight = (SegIdx + 1) * NumSides + NextSideIdx;
 
 			// Triangle 1
-			Triangles.Add(TopLeft);
-			Triangles.Add(BottomLeft);
-			Triangles.Add(TopRight);
+			DrawTriangleFromVertex(Triangles, TopLeft, BottomLeft, BottomRight);
 
 			// Triangle 2
-			Triangles.Add(TopRight);
-			Triangles.Add(BottomLeft);
-			Triangles.Add(BottomRight);
+			DrawTriangleFromVertex(Triangles, TopRight, TopLeft,BottomRight);
 		}
 	}
 
