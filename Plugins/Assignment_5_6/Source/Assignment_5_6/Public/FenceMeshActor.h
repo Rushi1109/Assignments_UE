@@ -49,6 +49,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 	USplineComponent* SplineComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Vertical Rail")
+	UMaterialInterface* SourceMaterial;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Vertical Rail")
 	UVerticleRailAsset* VerticleRailAsset;
 
@@ -60,6 +63,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fence Properties")
 	FFenceProperties FenceProperties;
+
+	UPROPERTY()
+	UMaterialInstanceDynamic* DynamicMaterial;
 
 	UFUNCTION(BlueprintCallable)
 	void GenerateStaticFence();

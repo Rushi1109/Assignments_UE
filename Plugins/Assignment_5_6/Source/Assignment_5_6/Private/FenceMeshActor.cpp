@@ -13,6 +13,7 @@ AFenceMeshActor::AFenceMeshActor() {
 
 	SplineComponent = CreateDefaultSubobject<USplineComponent>(TEXT("FenceMeshSplineComponent"));
 	SplineComponent->SetupAttachment(SceneRoot);
+
 }
 
 // Called when the game starts or when spawned
@@ -32,6 +33,10 @@ void AFenceMeshActor::Tick(float DeltaTime) {
 
 void AFenceMeshActor::OnConstruction(const FTransform& Transform) {
 	Super::OnConstruction(Transform);
+
+	if (SourceMaterial && !DynamicMaterial) {
+		DynamicMaterial = UMaterialInstanceDynamic::Create(SourceMaterial, this);
+	}
 
 	DestroyStaticFence();
 
@@ -65,6 +70,15 @@ void AFenceMeshActor::GenerateStaticFence() {
 		}
 		if (RailingStaticMesh) {
 			RailingStaticMeshComponent->SetStaticMesh(RailingStaticMesh);
+		}
+		if (DynamicMaterial) {
+			float TileX = (FenceProperties.Length + FenceProperties.Width) / 20.0f;
+			float TileY = FenceProperties.Height / 50.0f;
+			DynamicMaterial->SetScalarParameterValue("TileX", TileX);
+			DynamicMaterial->SetScalarParameterValue("TileY", TileY);
+			for (int32 i = 0; i < 6; ++i) {
+				RailingStaticMeshComponent->SetMaterial(i, DynamicMaterial);
+			}
 		}
 
 		RailingStaticMeshComponent->SetRelativeLocationAndRotation(Location, Rotation);
@@ -128,6 +142,16 @@ void AFenceMeshActor::GenerateProceduralFence() {
 			if (SpawnedVerticalRailActor->RailTopType == ERailTopType::GothicStarTop || SpawnedVerticalRailActor->RailTopType == ERailTopType::GothicTop) {
 				SpawnedVerticalRailActor->AddActorLocalRotation(FRotator{ 0.0, 90.0, 0.0 });
 			}
+
+			if (DynamicMaterial) {
+				float TileX = (FenceProperties.Length + FenceProperties.Width) / 20.0f;
+				float TileY = FenceProperties.Height / 50.0f;
+				DynamicMaterial->SetScalarParameterValue("TileX", TileX);
+				DynamicMaterial->SetScalarParameterValue("TileY", TileY);
+				for (int32 i = 0; i < 6; ++i) {
+					SpawnedVerticalRailActor->ProceduralMeshComponent->SetMaterial(i, DynamicMaterial);
+				}
+			}
 		}
 
 		DistanceCovered += TotalSpacing;
@@ -153,13 +177,11 @@ void AFenceMeshActor::GenerateStaticHorizontalMesh() {
 		}
 
 		FVector StartLocation = SplineComponent->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
-		FVector EndLocation = SplineComponent->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local);
-
-		FVector ForwardDirection = UKismetMathLibrary::GetDirectionUnitVector(StartLocation, EndLocation);
-		FVector UpDirection = UKismetMathLibrary::GetUpVector(GetActorRotation());
-		FVector RightDirection = UKismetMathLibrary::RotateAngleAxis(ForwardDirection, 90, UpDirection);
-
 		FRotator BeamRotation = SplineComponent->GetRotationAtSplinePoint(i, ESplineCoordinateSpace::Local);
+
+		FVector ForwardDirection = UKismetMathLibrary::GetForwardVector(BeamRotation);
+		FVector RightDirection = UKismetMathLibrary::GetRightVector(BeamRotation);
+		FVector UpDirection = UKismetMathLibrary::GetUpVector(BeamRotation);
 
 		StartLocation += (ForwardDirection * (DistanceBetweenPoints / 2));
 		StartLocation += (-RightDirection * ((FenceProperties.Width + 3) / 2));
@@ -186,6 +208,15 @@ void AFenceMeshActor::GenerateStaticHorizontalMesh() {
 		HorizontalStaticMeshComponentDown->SetRelativeRotation(BeamRotation);
 		HorizontalStaticMeshComponentDown->SetRelativeLocation(StartLocation);
 		HorizontalStaticMeshComponentDown->SetWorldScale3D(FVector{ (DistanceBetweenPoints + 16) / 100, FenceProperties.Width / 10, FenceProperties.Height / 100 });
+
+		if (DynamicMaterial) {
+			float TileX = (FenceProperties.Length + FenceProperties.Width) / 20.0f;
+			float TileY = FenceProperties.Height / 50.0f;
+			DynamicMaterial->SetScalarParameterValue("TileX", TileX);
+			DynamicMaterial->SetScalarParameterValue("TileY", TileY);
+			HorizontalStaticMeshComponentUp->SetMaterial(0, DynamicMaterial);
+			HorizontalStaticMeshComponentDown->SetMaterial(0, DynamicMaterial);
+		}
 	}
 }
 
@@ -207,13 +238,11 @@ void AFenceMeshActor::GenerateProceduralHorizontalMesh() {
 		float Distance = SplineComponent->GetDistanceAlongSplineAtSplinePoint(i + 1) - SplineComponent->GetDistanceAlongSplineAtSplinePoint(i);
 
 		FVector StartLocation = SplineComponent->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::World);
-		FVector EndLocation = SplineComponent->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::World);
+		FRotator BeamRotation = SplineComponent->GetRotationAtSplinePoint(i, ESplineCoordinateSpace::World);
 
-		FVector ForwardDirection = UKismetMathLibrary::GetDirectionUnitVector(StartLocation, EndLocation);
-		FVector UpDirection = UKismetMathLibrary::GetUpVector(GetActorRotation());
-		FVector RightDirection = UKismetMathLibrary::RotateAngleAxis(ForwardDirection, 90, UpDirection);
-
-		FRotator BeamRotation = UKismetMathLibrary::MakeRotationFromAxes(ForwardDirection, RightDirection, UpDirection);
+		FVector ForwardDirection = UKismetMathLibrary::GetForwardVector(BeamRotation);
+		FVector RightDirection = UKismetMathLibrary::GetRightVector(BeamRotation);
+		FVector UpDirection = UKismetMathLibrary::GetUpVector(BeamRotation);
 
 		// Upper Procedural Horizontal Beam
 		StartLocation += (ForwardDirection * (Distance / 2));
@@ -232,5 +261,14 @@ void AFenceMeshActor::GenerateProceduralHorizontalMesh() {
 
 		AVerticalRailActor* HorizontalBeamActorDown = GetWorld()->SpawnActor<AVerticalRailActor>(StartLocation, BeamRotation, SpawnParams);
 		HorizontalBeamActorDown->GenerateCube(0, FVector{ Distance + 16, (3 * FenceProperties.Width) / 10 , (10 * FenceProperties.Height) / 100 });
+
+		if (DynamicMaterial) {
+			float TileX = (FenceProperties.Length + FenceProperties.Width) / 20.0f;
+			float TileY = FenceProperties.Height / 50.0f;
+			DynamicMaterial->SetScalarParameterValue("TileX", TileX);
+			DynamicMaterial->SetScalarParameterValue("TileY", TileY);
+			HorizontalBeamActorUp->ProceduralMeshComponent->SetMaterial(0, DynamicMaterial);
+			HorizontalBeamActorDown->ProceduralMeshComponent->SetMaterial(0, DynamicMaterial);
+		}
 	}
 }
