@@ -59,12 +59,20 @@ void AFenceMeshActor::GenerateStaticFence() {
 		RailingStaticMeshComponent->RegisterComponent();
 		RailingStaticMeshComponent->AttachToComponent(SplineComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
+		UStaticMesh* RailingStaticMesh{nullptr};
+		if (VerticleRailAsset) {
+			RailingStaticMesh = VerticleRailAsset->RailDataMap[RailTopType].RailStaticMesh;
+		}
 		if (RailingStaticMesh) {
 			RailingStaticMeshComponent->SetStaticMesh(RailingStaticMesh);
 		}
 
 		RailingStaticMeshComponent->SetRelativeLocationAndRotation(Location, Rotation);
 		RailingStaticMeshComponent->SetWorldScale3D(FVector{ FenceProperties.Length / 10, FenceProperties.Width / 10, FenceProperties.Height / 100 });
+
+		if (RailTopType == ERailTopType::GothicStarTop || RailTopType == ERailTopType::GothicTop) {
+			RailingStaticMeshComponent->AddLocalRotation(FRotator{ 0.0, 90.0, 0.0 });
+		}
 
 		RailingStaticMeshes.Add(RailingStaticMeshComponent);
 
@@ -101,7 +109,12 @@ void AFenceMeshActor::GenerateProceduralFence() {
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		AVerticalRailActor* SpawnedVerticalRailActor;
+		TSubclassOf<AVerticalRailActor> VerticalRailActorClass{ nullptr };
+		if (VerticleRailAsset) {
+			VerticalRailActorClass = VerticleRailAsset->RailDataMap[RailTopType].RailClassRef;
+		}
+
+		AVerticalRailActor* SpawnedVerticalRailActor{ nullptr };
 		if (VerticalRailActorClass) {
 			SpawnedVerticalRailActor = GetWorld()->SpawnActor<AVerticalRailActor>(VerticalRailActorClass, StartLocation, StartRotation, SpawnParams);
 		}
@@ -112,8 +125,8 @@ void AFenceMeshActor::GenerateProceduralFence() {
 		if (SpawnedVerticalRailActor) {
 			SpawnedVerticalRailActor->GenerateVerticalRailActor(FVector{ FenceProperties.Length, FenceProperties.Width, FenceProperties.Height });
 
-			if (SpawnedVerticalRailActor->RailTopType == ERailTopType::GothicTop || SpawnedVerticalRailActor->RailTopType == ERailTopType::GothicStarTop) {
-				AddActorLocalRotation(FRotator{ 0.0, 90.0, 0.0 });
+			if (SpawnedVerticalRailActor->RailTopType == ERailTopType::GothicStarTop || SpawnedVerticalRailActor->RailTopType == ERailTopType::GothicTop) {
+				SpawnedVerticalRailActor->AddActorLocalRotation(FRotator{ 0.0, 90.0, 0.0 });
 			}
 		}
 
@@ -146,13 +159,13 @@ void AFenceMeshActor::GenerateStaticHorizontalMesh() {
 		FVector UpDirection = UKismetMathLibrary::GetUpVector(GetActorRotation());
 		FVector RightDirection = UKismetMathLibrary::RotateAngleAxis(ForwardDirection, 90, UpDirection);
 
-		FRotator BeamRotation = UKismetMathLibrary::MakeRotationFromAxes(ForwardDirection, RightDirection, UpDirection);
+		FRotator BeamRotation = SplineComponent->GetRotationAtSplinePoint(i, ESplineCoordinateSpace::Local);
 
 		StartLocation += (ForwardDirection * (DistanceBetweenPoints / 2));
 		StartLocation += (-RightDirection * ((FenceProperties.Width + 3) / 2));
 		StartLocation += (UpDirection * (3 * FenceProperties.Height / 4));
 
-		HorizontalStaticMeshComponentUp->SetWorldRotation(BeamRotation);
+		HorizontalStaticMeshComponentUp->SetRelativeRotation(BeamRotation);
 		HorizontalStaticMeshComponentUp->SetRelativeLocation(StartLocation);
 		HorizontalStaticMeshComponentUp->SetWorldScale3D(FVector{ (DistanceBetweenPoints + 16) / 100, FenceProperties.Width / 10, FenceProperties.Height / 100 });
 
@@ -170,7 +183,7 @@ void AFenceMeshActor::GenerateStaticHorizontalMesh() {
 		StartLocation -= (UpDirection * (3 * FenceProperties.Height / 4));
 		StartLocation += (UpDirection * (FenceProperties.Height / 3));
 
-		HorizontalStaticMeshComponentDown->SetWorldRotation(BeamRotation);
+		HorizontalStaticMeshComponentDown->SetRelativeRotation(BeamRotation);
 		HorizontalStaticMeshComponentDown->SetRelativeLocation(StartLocation);
 		HorizontalStaticMeshComponentDown->SetWorldScale3D(FVector{ (DistanceBetweenPoints + 16) / 100, FenceProperties.Width / 10, FenceProperties.Height / 100 });
 	}
