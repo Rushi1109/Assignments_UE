@@ -4,23 +4,19 @@
 #include "MeshGeneratorUI.h"
 
 void UMeshGeneratorUI::HideBoxFields() {
-	TextDimension->SetVisibility(ESlateVisibility::Hidden);
-	CubeDimensionX->SetVisibility(ESlateVisibility::Hidden);
-	CubeDimensionY->SetVisibility(ESlateVisibility::Hidden);
-	CubeDimensionZ->SetVisibility(ESlateVisibility::Hidden);
+	Box_X->SetVisibility(ESlateVisibility::Hidden);
+	Box_Y->SetVisibility(ESlateVisibility::Hidden);
+	Box_Z->SetVisibility(ESlateVisibility::Hidden);
 	ProgressBar->SetVisibility(ESlateVisibility::Hidden);
 
-	TextRadius->SetVisibility(ESlateVisibility::Visible);
-	SphericalRadius->SetVisibility(ESlateVisibility::Visible);
+	Box_Spherical->SetVisibility(ESlateVisibility::Visible);
 }
 
 void UMeshGeneratorUI::HideSphereFields() {
-	TextDimension->SetVisibility(ESlateVisibility::Visible);
-	CubeDimensionX->SetVisibility(ESlateVisibility::Visible);
-	CubeDimensionY->SetVisibility(ESlateVisibility::Visible);
-	CubeDimensionZ->SetVisibility(ESlateVisibility::Visible);
+	Box_X->SetVisibility(ESlateVisibility::Visible);
+	Box_Y->SetVisibility(ESlateVisibility::Visible);
+	Box_Z->SetVisibility(ESlateVisibility::Visible);
 
 	ProgressBar->SetVisibility(ESlateVisibility::Hidden);
-	TextRadius->SetVisibility(ESlateVisibility::Hidden);
-	SphericalRadius->SetVisibility(ESlateVisibility::Hidden);
+	Box_Spherical->SetVisibility(ESlateVisibility::Hidden);
 }

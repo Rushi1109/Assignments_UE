@@ -5,7 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
-AHISMController::AHISMController() : bIsAreaSelected{ false }, SelectionAreaShape{ nullptr }, WorldLocation { 0.0, 0.0, 0.0 }, WorldDirection{ 0.0, 0.0, 0.0 } {
+AHISMController::AHISMController() : bIsAreaSelected{ false }, SelectionAreaShape{ nullptr }, WorldLocation{ 0.0, 0.0, 0.0 }, WorldDirection{ 0.0, 0.0, 0.0 } {
 	
 }
 
@@ -25,10 +25,15 @@ void AHISMController::BeginPlay() {
 		MeshGeneratorUI->CubeDimensionX->OnValueChanged.AddDynamic(this, &AHISMController::GenerateNewBox);
 		MeshGeneratorUI->CubeDimensionY->OnValueChanged.AddDynamic(this, &AHISMController::GenerateNewBox);
 		MeshGeneratorUI->CubeDimensionZ->OnValueChanged.AddDynamic(this, &AHISMController::GenerateNewBox);
+		MeshGeneratorUI->GenerateMeshButton->OnClicked.AddDynamic(this, &AHISMController::ScatterMeshes);
 	}
 
 	if (SelectionAreaClass) {
 		SelectionAreaShape = GetWorld()->SpawnActor<ASelectionArea>(SelectionAreaClass, FVector::ZeroVector, FRotator::ZeroRotator);
+	}
+
+	if (SelectionAreaShape && MeshGeneratorClass) {
+		MeshGenerator = NewObject<AMeshGenerator>(this, MeshGeneratorClass);
 	}
 }
 
@@ -81,13 +86,15 @@ void AHISMController::HandleLeftClick() {
 }
 
 void AHISMController::HandleShapeSelectionChange(FString SelectedItem, ESelectInfo::Type SelectionType) {
-	if (SelectedItem == "Spherical" && MeshGeneratorUI) {
+	if (SelectedItem == "Spherical" && MeshGeneratorUI && SelectionAreaShape) {
+		SelectionAreaShape->ShapeType = EShapeType::Spherical;
 		MeshGeneratorUI->HideBoxFields();
 
 		float Radius = MeshGeneratorUI->CubeDimensionZ->GetValue();
 		GenerateNewSphere(Radius);
 	}
 	else if (SelectedItem == "Box" && MeshGeneratorUI) {
+		SelectionAreaShape->ShapeType = EShapeType::Box;
 		MeshGeneratorUI->HideSphereFields();
 
 		GenerateNewBox(float{0.0});
@@ -96,8 +103,9 @@ void AHISMController::HandleShapeSelectionChange(FString SelectedItem, ESelectIn
 
 
 void AHISMController::GenerateNewSphere(float InValue) {
+	InValue = MeshGeneratorUI->SphericalRadius->GetValue();
 	if (SelectionAreaShape) {
-		SelectionAreaShape->GenerateSphere(0, InValue, FMath::FloorToInt(InValue / 10), FMath::FloorToInt(InValue / 5), InValue);
+		SelectionAreaShape->GenerateSphere(0, InValue, 30, 50, InValue);
 	}
 }
 
@@ -108,5 +116,17 @@ void AHISMController::GenerateNewBox(float InValue) {
 		float DimensionZ = MeshGeneratorUI->CubeDimensionZ->GetValue();
 
 		SelectionAreaShape->GenerateBox(0, DimensionX, DimensionY, DimensionZ, (float)DimensionZ / 2);
+	}
+}
+
+void AHISMController::ScatterMeshes() {
+	if (MeshGenerator) {
+		if (SelectionAreaShape->ShapeType == EShapeType::Spherical) {
+			MeshGenerator->AreaParams(SelectionAreaShape, FVector{ MeshGeneratorUI->SphericalRadius->GetValue() }, MeshGeneratorUI->InstanceCount->GetValue());
+		}
+		else {
+			MeshGenerator->AreaParams(SelectionAreaShape, FVector{ MeshGeneratorUI->CubeDimensionX->GetValue(), MeshGeneratorUI->CubeDimensionY->GetValue(), MeshGeneratorUI->CubeDimensionZ->GetValue() }, MeshGeneratorUI->InstanceCount->GetValue());
+		}
+		MeshGenerator->ScatterMeshesInSelectedArea();
 	}
 }

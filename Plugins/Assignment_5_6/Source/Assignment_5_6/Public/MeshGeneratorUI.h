@@ -9,8 +9,8 @@
 #include "UMG/Public/Components/SpinBox.h"
 #include "UMG/Public/Components/Button.h"
 #include "UMG/Public/Components/ProgressBar.h"
-#include "UMG/Public/Components/EditableTextBox.h"
 #include "UMG/Public/Components/CanvasPanel.h"
+#include "UMG/Public/Components/HorizontalBox.h"
 #include "MeshGeneratorUI.generated.h"
 
 /**
@@ -31,10 +31,16 @@ public:
 	UComboBoxString* ComboBox;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* TextDimension;
+	UHorizontalBox* Box_X;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UHorizontalBox* Box_Y;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UHorizontalBox* Box_Z;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* TextRadius;
+	UHorizontalBox* Box_Spherical;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	USpinBox* SphericalRadius;
@@ -55,5 +61,5 @@ public:
 	UProgressBar* ProgressBar;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UEditableTextBox* InstanceCount;
+	USpinBox* InstanceCount;
 };

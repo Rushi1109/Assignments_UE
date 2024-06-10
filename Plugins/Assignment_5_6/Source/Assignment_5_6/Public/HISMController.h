@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "SelectionArea.h"
 #include "GameFramework/PlayerController.h"
+#include "MeshGenerator.h"
 #include "MeshGeneratorUI.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
@@ -39,6 +40,9 @@ public:
 
 	UFUNCTION()
 	void GenerateNewBox(float InValue);
+	
+	UFUNCTION()
+	void ScatterMeshes();
 
 	UPROPERTY()
 	bool bIsAreaSelected;
@@ -54,6 +58,12 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "HISM")
 	UMeshGeneratorUI* MeshGeneratorUI;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HISM")
+	TSubclassOf<AMeshGenerator> MeshGeneratorClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HISM")
+	AMeshGenerator* MeshGenerator;
 
 	FVector WorldLocation, WorldDirection;
 	FInputModeGameAndUI InputMode;

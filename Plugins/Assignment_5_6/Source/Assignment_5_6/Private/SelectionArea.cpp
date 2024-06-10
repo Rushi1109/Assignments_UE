@@ -5,7 +5,7 @@
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
-ASelectionArea::ASelectionArea() {
+ASelectionArea::ASelectionArea() : ShapeType{ EShapeType::Spherical }, TranslucentMaterial{ nullptr } {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -34,7 +34,7 @@ void ASelectionArea::CreateAreaShape() {
 	ProceduralMeshComponent->ClearAllMeshSections();
 
 	//GenerateBox(0, 100.0, 100.0, 100.0, 50.0);
-	GenerateSphere(1, 100, 10, 25, 100);
+	GenerateSphere(1, 100, 30, 50, 100);
 }
 
 void ASelectionArea::DrawTriangleFromVertex(TArray<int32>& Triangles, int32 Vertex0, int32 Vertex1, int32 Vertex2) {
@@ -115,6 +115,7 @@ void ASelectionArea::GenerateBox(int32 SectionIndex, double DimensionX, double D
 	if (TranslucentMaterial) {
 		ProceduralMeshComponent->SetMaterial(SectionIndex, TranslucentMaterial);
 	}
+	ShapeType = EShapeType::Box;
 }
 
 void ASelectionArea::GenerateSphere(int32 SectionIndex, float Radius, int32 RingsCount, int32 PointsCount, double ZOffset, float CurveFactor) {
@@ -168,4 +169,5 @@ void ASelectionArea::GenerateSphere(int32 SectionIndex, float Radius, int32 Ring
 	if (TranslucentMaterial) {
 		ProceduralMeshComponent->SetMaterial(SectionIndex, TranslucentMaterial);
 	}
+	ShapeType = EShapeType::Spherical;
 }

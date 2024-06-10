@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "SelectionArea.h"
+#include "MeshDataAsset.h"
+#include "AsyncScatterTask.h"
 #include "MeshGenerator.generated.h"
 
 UCLASS()
@@ -14,6 +17,9 @@ public:
 	// Sets default values for this actor's properties
 	AMeshGenerator();
 
+	UFUNCTION(BlueprintCallable)
+	void AreaParams(ASelectionArea* InSelectionArea, const FVector& InAreaDimensions, int32 InInstanceCount);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -22,4 +28,44 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	void ScatterMeshesInSelectedArea();
+
+	void AddMeshInstance(UStaticMesh* StaticMesh, const FTransform& Transform);
+
+	UPROPERTY(EditDefaultsOnly, Category = "HISM")
+	UMeshDataAsset* DataAsset;
+
+	UPROPERTY()
+	ASelectionArea* SelecetionArea;
+	
+	UFUNCTION(BlueprintPure)
+	FVector GetDimensions() const {
+		return Dimensions;
+	}
+
+	void SetDimensions(const FVector& InDimensions) {
+		Dimensions = InDimensions;
+	}
+
+	UFUNCTION(BlueprintPure)
+	int32 GetNumberOfInstances() const {
+		return NumberOfInstances;
+	}
+
+	void SetNumberOfInstances(int32 InInstanceCount) {
+		NumberOfInstances = InInstanceCount;
+	}
+private:
+
+	UPROPERTY()
+	FVector Dimensions;
+
+	UPROPERTY(EditAnywhere, Category = "HISM")
+	int32 NumberOfInstances;
+
+	FAsyncTask<FAsyncScatterTask>* AsyncScatterTask;
+
+	UPROPERTY()
+	TMap<UStaticMesh*, UHierarchicalInstancedStaticMeshComponent*> HISMComponents;
 };

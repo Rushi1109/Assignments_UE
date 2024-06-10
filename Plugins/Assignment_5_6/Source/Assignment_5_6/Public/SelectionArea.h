@@ -40,6 +40,9 @@ public:
 
 	void DrawTriangleFromVertex(TArray<int32>& Triangles, int32 Vertex0, int32 Vertex1, int32 Vertex2);
 
+	UPROPERTY()
+	TEnumAsByte<EShapeType> ShapeType;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Procedural Mesh")
 	UMaterialInterface* TranslucentMaterial;
 
