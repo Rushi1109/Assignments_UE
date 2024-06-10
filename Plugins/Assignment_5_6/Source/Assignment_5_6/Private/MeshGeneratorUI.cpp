@@ -20,3 +20,19 @@ void UMeshGeneratorUI::HideSphereFields() {
 	ProgressBar->SetVisibility(ESlateVisibility::Hidden);
 	Box_Spherical->SetVisibility(ESlateVisibility::Hidden);
 }
+
+void UMeshGeneratorUI::ShowProgressBar() {
+	ProgressBar->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UMeshGeneratorUI::UpdateProgressBar(float InPercent) {
+	ProgressBar->SetPercent(InPercent);
+
+	if (InPercent == 1.f) {
+		HideProgressBar();
+	}
+}
+
+void UMeshGeneratorUI::HideProgressBar() {
+	ProgressBar->SetVisibility(ESlateVisibility::Hidden);
+}

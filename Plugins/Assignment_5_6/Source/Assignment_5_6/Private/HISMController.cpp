@@ -34,6 +34,8 @@ void AHISMController::BeginPlay() {
 
 	if (SelectionAreaShape && MeshGeneratorClass) {
 		MeshGenerator = NewObject<AMeshGenerator>(this, MeshGeneratorClass);
+
+		MeshGenerator->OnProgressed.BindUObject(this, &AHISMController::UpdateProgressBar);
 	}
 }
 
@@ -93,7 +95,7 @@ void AHISMController::HandleShapeSelectionChange(FString SelectedItem, ESelectIn
 		float Radius = MeshGeneratorUI->CubeDimensionZ->GetValue();
 		GenerateNewSphere(Radius);
 	}
-	else if (SelectedItem == "Box" && MeshGeneratorUI) {
+	else if (SelectedItem == "Box" && MeshGeneratorUI && SelectionAreaShape) {
 		SelectionAreaShape->ShapeType = EShapeType::Box;
 		MeshGeneratorUI->HideSphereFields();
 
@@ -127,6 +129,14 @@ void AHISMController::ScatterMeshes() {
 		else {
 			MeshGenerator->AreaParams(SelectionAreaShape, FVector{ MeshGeneratorUI->CubeDimensionX->GetValue(), MeshGeneratorUI->CubeDimensionY->GetValue(), MeshGeneratorUI->CubeDimensionZ->GetValue() }, MeshGeneratorUI->InstanceCount->GetValue());
 		}
+
+		MeshGeneratorUI->ShowProgressBar();
 		MeshGenerator->ScatterMeshesInSelectedArea();
+	}
+}
+
+void AHISMController::UpdateProgressBar(float InPercent) {
+	if (MeshGenerator && MeshGeneratorUI) {
+		MeshGeneratorUI->UpdateProgressBar(InPercent);
 	}
 }

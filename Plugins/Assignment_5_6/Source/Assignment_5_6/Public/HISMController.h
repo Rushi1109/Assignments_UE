@@ -44,6 +44,9 @@ public:
 	UFUNCTION()
 	void ScatterMeshes();
 
+	UFUNCTION()
+	void UpdateProgressBar(float InPercent);
+
 	UPROPERTY()
 	bool bIsAreaSelected;
 

@@ -9,6 +9,8 @@
 #include "AsyncScatterTask.h"
 #include "MeshGenerator.generated.h"
 
+DECLARE_DELEGATE_OneParam(FOnProgressed, float);
+
 UCLASS()
 class ASSIGNMENT_5_6_API AMeshGenerator : public AActor {
 	GENERATED_BODY()
@@ -23,21 +25,26 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void FinishScatter();
+
 	UFUNCTION(BlueprintCallable)
 	void ScatterMeshesInSelectedArea();
 
-	void AddMeshInstance(UStaticMesh* StaticMesh, const FTransform& Transform);
+	void AddMeshInstance(UStaticMesh* StaticMesh, const FTransform& Transform, UMaterialInstance* Material);
 
 	UPROPERTY(EditDefaultsOnly, Category = "HISM")
 	UMeshDataAsset* DataAsset;
 
 	UPROPERTY()
 	ASelectionArea* SelecetionArea;
+
+	FOnProgressed OnProgressed;
 	
 	UFUNCTION(BlueprintPure)
 	FVector GetDimensions() const {
@@ -63,6 +70,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "HISM")
 	int32 NumberOfInstances;
+
+	int32 GeneratedInstances;
 
 	FAsyncTask<FAsyncScatterTask>* AsyncScatterTask;
 

@@ -14,6 +14,9 @@ struct FMeshProps {
 	UStaticMesh* StaticMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh Data")
+	UMaterialInstance* Material;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh Data")
 	float MinScale;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh Data")
@@ -42,10 +45,4 @@ class ASSIGNMENT_5_6_API UMeshDataAsset : public UDataAsset {
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<FMeshProps> MeshData;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TArray<UMaterial*> Materials;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TArray<FLinearColor> Colors;
 };

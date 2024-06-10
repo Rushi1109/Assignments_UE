@@ -23,6 +23,9 @@ class ASSIGNMENT_5_6_API UMeshGeneratorUI : public UUserWidget {
 public:
 	void HideBoxFields();
 	void HideSphereFields();
+	void ShowProgressBar();
+	void UpdateProgressBar(float InPercent);
+	void HideProgressBar();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UCanvasPanel* Canvas;

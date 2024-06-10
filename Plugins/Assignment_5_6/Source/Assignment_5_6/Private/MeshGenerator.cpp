@@ -31,12 +31,25 @@ void AMeshGenerator::Tick(float DeltaTime) {
 
 }
 
+void AMeshGenerator::FinishScatter() {
+	GeneratedInstances = 0;
+	
+	if (AsyncScatterTask && !AsyncScatterTask->IsDone()) {
+		AsyncScatterTask->EnsureCompletion();
+	}
+
+	delete AsyncScatterTask;
+	AsyncScatterTask = nullptr;
+}
+
 void AMeshGenerator::ScatterMeshesInSelectedArea() {
+	FinishScatter();
+
 	AsyncScatterTask = new FAsyncTask<FAsyncScatterTask>(this);
 	AsyncScatterTask->StartBackgroundTask();
 }
 
-void AMeshGenerator::AddMeshInstance(UStaticMesh* StaticMesh, const FTransform& Transform) {
+void AMeshGenerator::AddMeshInstance(UStaticMesh* StaticMesh, const FTransform& Transform, UMaterialInstance* Material) {
 	auto** HISMCPtr = HISMComponents.Find(StaticMesh);
 
 	UHierarchicalInstancedStaticMeshComponent* NewHISMC;
@@ -50,9 +63,21 @@ void AMeshGenerator::AddMeshInstance(UStaticMesh* StaticMesh, const FTransform& 
 
 		HISMComponents.Add(StaticMesh, NewHISMC);
 	}
-	AsyncTask(ENamedThreads::GameThread, [NewHISMC, StaticMesh, Transform]() {
+
+	if (Material) {
+		NewHISMC->SetMaterial(0, Material);
+	}
+
+	AsyncTask(ENamedThreads::GameThread, [NewHISMC, StaticMesh, Transform, this]() {
 		NewHISMC->AddInstance(Transform, false);
 
-		});
+		++GeneratedInstances;
+		OnProgressed.ExecuteIfBound((float)GeneratedInstances / NumberOfInstances);
+	});
 }
 
+void AMeshGenerator::EndPlay(EEndPlayReason::Type EndPlayReason) {
+	FinishScatter();
+
+	Super::EndPlay(EndPlayReason);
+}

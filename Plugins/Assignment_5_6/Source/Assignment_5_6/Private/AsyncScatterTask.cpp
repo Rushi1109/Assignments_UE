@@ -24,16 +24,22 @@ void FAsyncScatterTask::DoWork() {
 					Position = FindRandomPointInBox(Origin, MeshGenerator->GetDimensions());
 				}
 
-				FTransform MeshTransform{ Position };
-
 				int32 MeshDataIndex = FMath::RandRange(0, MeshesData.Num()-1);
-				UStaticMesh* StaticMesh = MeshesData[MeshDataIndex].StaticMesh;
 
-				AsyncTask(ENamedThreads::GameThread, [this, StaticMesh, MeshTransform]() {
-					MeshGenerator->AddMeshInstance(StaticMesh, MeshTransform);
+				float Scale = FMath::RandRange(MeshesData[MeshDataIndex].MinScale, MeshesData[MeshDataIndex].MaxScale);
+				float RotationYaw = FMath::FRandRange(MeshesData[MeshDataIndex].MinRotation.Yaw, MeshesData[MeshDataIndex].MaxRotation.Yaw);
+				float RotationRoll = FMath::FRandRange(MeshesData[MeshDataIndex].MinRotation.Roll, MeshesData[MeshDataIndex].MaxRotation.Roll);
+				float RotationPitch = FMath::FRandRange(MeshesData[MeshDataIndex].MinRotation.Pitch, MeshesData[MeshDataIndex].MaxRotation.Pitch);
+				UStaticMesh* StaticMesh = MeshesData[MeshDataIndex].StaticMesh;
+				UMaterialInstance* Material = MeshesData[MeshDataIndex].Material;
+
+				FTransform MeshTransform{ FRotator{ RotationPitch, RotationYaw, RotationRoll }, Position, FVector{Scale} };
+
+				AsyncTask(ENamedThreads::GameThread, [this, StaticMesh, MeshTransform, Material]() {
+					MeshGenerator->AddMeshInstance(StaticMesh, MeshTransform, Material);
 				});
 
-				FPlatformProcess::Sleep(0.01f);
+				FPlatformProcess::Sleep(0.001f);
 			}
 		}
 	}
