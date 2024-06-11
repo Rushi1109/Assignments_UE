@@ -33,7 +33,7 @@ void AMeshGenerator::Tick(float DeltaTime) {
 
 void AMeshGenerator::FinishScatter() {
 	GeneratedInstances = 0;
-	
+
 	if (AsyncScatterTask && !AsyncScatterTask->IsDone()) {
 		AsyncScatterTask->EnsureCompletion();
 	}
@@ -51,6 +51,8 @@ void AMeshGenerator::ScatterMeshesInSelectedArea() {
 
 void AMeshGenerator::AddMeshInstance(UStaticMesh* StaticMesh, const FTransform& Transform, UMaterialInstance* Material) {
 	auto** HISMCPtr = HISMComponents.Find(StaticMesh);
+
+	if (!this->IsValidLowLevel()) return;
 
 	UHierarchicalInstancedStaticMeshComponent* NewHISMC;
 	if (HISMCPtr && *HISMCPtr && (*HISMCPtr)->IsValidLowLevel()) {
@@ -74,10 +76,4 @@ void AMeshGenerator::AddMeshInstance(UStaticMesh* StaticMesh, const FTransform& 
 		++GeneratedInstances;
 		OnProgressed.ExecuteIfBound((float)GeneratedInstances / NumberOfInstances);
 	});
-}
-
-void AMeshGenerator::EndPlay(EEndPlayReason::Type EndPlayReason) {
-	FinishScatter();
-
-	Super::EndPlay(EndPlayReason);
 }

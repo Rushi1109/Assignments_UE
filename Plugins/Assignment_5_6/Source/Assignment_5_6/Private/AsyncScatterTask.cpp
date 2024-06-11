@@ -9,11 +9,11 @@ FAsyncScatterTask::FAsyncScatterTask(AMeshGenerator* InMeshGenerator) {
 }
 
 void FAsyncScatterTask::DoWork() {
-	if (MeshGenerator) {
+	if (IsValid(MeshGenerator) && IsValid(MeshGenerator->SelecetionArea)) {
 		if (UMeshDataAsset* DataAsset = MeshGenerator->DataAsset) {
 			TArray<FMeshProps> MeshesData = DataAsset->MeshData;
 
-			for (int i = 0; i < MeshGenerator->GetNumberOfInstances(); ++i) {
+			for (int i = 0; IsValid(MeshGenerator->SelecetionArea) && (i < MeshGenerator->GetNumberOfInstances()); ++i) {
 				FVector Origin{ MeshGenerator->SelecetionArea->GetActorLocation() };
 				FVector Position{};
 

@@ -26,6 +26,8 @@ public:
 	void ShowProgressBar();
 	void UpdateProgressBar(float InPercent);
 	void HideProgressBar();
+	void EnableMeshGenerationButton();
+	void DisableMeshGenerationButton();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UCanvasPanel* Canvas;
@@ -62,6 +64,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UProgressBar* ProgressBar;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UHorizontalBox* HorizontalProgressText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UTextBlock* TextProgressPercent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	USpinBox* InstanceCount;

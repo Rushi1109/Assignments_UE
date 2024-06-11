@@ -18,6 +18,7 @@ void AHISMController::BeginPlay() {
 	if (MeshGeneratorUIClass) {
 		MeshGeneratorUI = CreateWidget<UMeshGeneratorUI>(this, MeshGeneratorUIClass);
 		MeshGeneratorUI->HideBoxFields();
+		MeshGeneratorUI->HideProgressBar();
 		MeshGeneratorUI->AddToViewport(1);
 
 		MeshGeneratorUI->ComboBox->OnSelectionChanged.AddDynamic(this, &AHISMController::HandleShapeSelectionChange);
@@ -130,6 +131,7 @@ void AHISMController::ScatterMeshes() {
 			MeshGenerator->AreaParams(SelectionAreaShape, FVector{ MeshGeneratorUI->CubeDimensionX->GetValue(), MeshGeneratorUI->CubeDimensionY->GetValue(), MeshGeneratorUI->CubeDimensionZ->GetValue() }, MeshGeneratorUI->InstanceCount->GetValue());
 		}
 
+		MeshGeneratorUI->DisableMeshGenerationButton();
 		MeshGeneratorUI->ShowProgressBar();
 		MeshGenerator->ScatterMeshesInSelectedArea();
 	}

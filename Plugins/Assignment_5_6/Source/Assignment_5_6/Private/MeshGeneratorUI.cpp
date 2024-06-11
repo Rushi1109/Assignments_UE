@@ -23,16 +23,32 @@ void UMeshGeneratorUI::HideSphereFields() {
 
 void UMeshGeneratorUI::ShowProgressBar() {
 	ProgressBar->SetVisibility(ESlateVisibility::Visible);
+	HorizontalProgressText->SetVisibility(ESlateVisibility::Visible);
 }
 
 void UMeshGeneratorUI::UpdateProgressBar(float InPercent) {
 	ProgressBar->SetPercent(InPercent);
+	
+	FText Percent = FText::AsNumber(FMath::RoundToInt(InPercent * 100));
+	FText PercentSymbol = FText::FromString(" %");
+
+	TextProgressPercent->SetText(FText::Format(FText::FromString("{0}{1}"), Percent, PercentSymbol));
 
 	if (InPercent == 1.f) {
 		HideProgressBar();
+		EnableMeshGenerationButton();
 	}
 }
 
 void UMeshGeneratorUI::HideProgressBar() {
 	ProgressBar->SetVisibility(ESlateVisibility::Hidden);
+	HorizontalProgressText->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UMeshGeneratorUI::EnableMeshGenerationButton() {
+	GenerateMeshButton->SetIsEnabled(true);
+}
+
+void UMeshGeneratorUI::DisableMeshGenerationButton() {
+	GenerateMeshButton->SetIsEnabled(false);
 }
